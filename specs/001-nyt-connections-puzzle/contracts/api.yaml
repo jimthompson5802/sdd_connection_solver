@@ -1,0 +1,533 @@
+openapi: 3.0.3
+info:
+  title: NYT Connections Puzzle Assistant API
+  description: Backend API for the NYT Connections puzzle solving web application
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+paths:
+  /api/v1/puzzles:
+    post:
+      summary: Create a new puzzle
+      operationId: createPuzzle
+      tags: [Puzzles]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePuzzleRequest'
+      responses:
+        '201':
+          description: Puzzle created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PuzzleResponse'
+        '400':
+          description: Invalid puzzle data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/puzzles/{puzzle_id}:
+    get:
+      summary: Get puzzle details
+      operationId: getPuzzle
+      tags: [Puzzles]
+      parameters:
+        - name: puzzle_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Puzzle details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PuzzleResponse'
+        '404':
+          description: Puzzle not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/sessions:
+    post:
+      summary: Create a new game session
+      operationId: createSession
+      tags: [Sessions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '400':
+          description: Invalid session data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/sessions/{session_id}:
+    get:
+      summary: Get current session state
+      operationId: getSession
+      tags: [Sessions]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Session state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/sessions/{session_id}/guesses:
+    post:
+      summary: Submit a word group guess
+      operationId: submitGuess
+      tags: [Guesses]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitGuessRequest'
+      responses:
+        '201':
+          description: Guess submitted and evaluated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuessResponse'
+        '400':
+          description: Invalid guess data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Cannot make guess (game over or invalid state)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: Get guess history for session
+      operationId: getGuessHistory
+      tags: [Guesses]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Guess history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuessHistoryResponse'
+
+  /api/v1/sessions/{session_id}/recommendations:
+    post:
+      summary: Request AI recommendations for current puzzle state
+      operationId: requestRecommendations
+      tags: [AI Recommendations]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '202':
+          description: Recommendation request accepted, processing async
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationRequestResponse'
+        '400':
+          description: Invalid session state for recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: Get latest AI recommendations
+      operationId: getRecommendations
+      tags: [AI Recommendations]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: AI recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationsResponse'
+        '202':
+          description: Recommendations still processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessingResponse'
+
+  /ws/sessions/{session_id}/recommendations:
+    get:
+      summary: WebSocket connection for real-time AI recommendations
+      tags: [WebSocket]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '101':
+          description: WebSocket connection established
+        '400':
+          description: Invalid session
+        '404':
+          description: Session not found
+
+components:
+  schemas:
+    CreatePuzzleRequest:
+      type: object
+      required: [words, groups]
+      properties:
+        words:
+          type: array
+          items:
+            type: string
+          minItems: 16
+          maxItems: 16
+          example: ["BASS", "PIANO", "GUITAR", "DRUMS", "SALMON", "TUNA", "COD", "TROUT", "YELLOW", "BLUE", "RED", "GREEN", "APPLE", "ORANGE", "BANANA", "GRAPE"]
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupDefinition'
+          minItems: 4
+          maxItems: 4
+        difficulty_level:
+          type: string
+          enum: [easy, medium, hard, expert]
+          default: medium
+
+    GroupDefinition:
+      type: object
+      required: [theme, difficulty, word_indices]
+      properties:
+        theme:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: "Musical Instruments"
+        difficulty:
+          type: string
+          enum: [yellow, green, blue, purple]
+        word_indices:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            maximum: 15
+          minItems: 4
+          maxItems: 4
+          example: [0, 1, 2, 3]
+
+    PuzzleResponse:
+      type: object
+      required: [id, words, created_at, difficulty_level]
+      properties:
+        id:
+          type: string
+          format: uuid
+        words:
+          type: array
+          items:
+            type: string
+          minItems: 16
+          maxItems: 16
+        created_at:
+          type: string
+          format: date-time
+        difficulty_level:
+          type: string
+          enum: [easy, medium, hard, expert]
+
+    CreateSessionRequest:
+      type: object
+      required: [puzzle_id]
+      properties:
+        puzzle_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          nullable: true
+
+    SessionResponse:
+      type: object
+      required: [id, puzzle_id, start_time, last_activity, status, remaining_words, incorrect_guess_count, solved_groups_count, can_make_guess]
+      properties:
+        id:
+          type: string
+          format: uuid
+        puzzle_id:
+          type: string
+          format: uuid
+        start_time:
+          type: string
+          format: date-time
+        last_activity:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [active, completed, failed, abandoned]
+        remaining_words:
+          type: array
+          items:
+            type: string
+        incorrect_guess_count:
+          type: integer
+          minimum: 0
+          maximum: 4
+        solved_groups_count:
+          type: integer
+          minimum: 0
+          maximum: 4
+        solved_groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/SolvedGroup'
+        can_make_guess:
+          type: boolean
+          description: Whether user can make another guess
+
+    SolvedGroup:
+      type: object
+      required: [theme, difficulty, words]
+      properties:
+        theme:
+          type: string
+        difficulty:
+          type: string
+          enum: [yellow, green, blue, purple]
+        words:
+          type: array
+          items:
+            type: string
+          minItems: 4
+          maxItems: 4
+
+    SubmitGuessRequest:
+      type: object
+      required: [selected_words]
+      properties:
+        selected_words:
+          type: array
+          items:
+            type: string
+          minItems: 4
+          maxItems: 4
+        ai_recommendation_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of AI recommendation that influenced this guess
+
+    GuessResponse:
+      type: object
+      required: [id, selected_words, result, timestamp]
+      properties:
+        id:
+          type: string
+          format: uuid
+        selected_words:
+          type: array
+          items:
+            type: string
+          minItems: 4
+          maxItems: 4
+        result:
+          type: string
+          enum: [correct, incorrect, one_away]
+        timestamp:
+          type: string
+          format: date-time
+        matched_group:
+          $ref: '#/components/schemas/SolvedGroup'
+          nullable: true
+        session_status:
+          type: string
+          enum: [active, completed, failed]
+          description: Updated session status after this guess
+
+    GuessHistoryResponse:
+      type: object
+      required: [guesses]
+      properties:
+        guesses:
+          type: array
+          items:
+            $ref: '#/components/schemas/GuessResponse'
+
+    RecommendationRequestResponse:
+      type: object
+      required: [request_id, status]
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [processing]
+        estimated_completion_seconds:
+          type: integer
+          minimum: 1
+          maximum: 10
+
+    RecommendationsResponse:
+      type: object
+      required: [id, recommendations, timestamp, confidence_scores]
+      properties:
+        id:
+          type: string
+          format: uuid
+        recommendations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecommendationGroup'
+        timestamp:
+          type: string
+          format: date-time
+        confidence_scores:
+          type: object
+          additionalProperties:
+            type: number
+            minimum: 0.0
+            maximum: 1.0
+        processing_time_ms:
+          type: integer
+          minimum: 1
+        llm_model:
+          type: string
+
+    RecommendationGroup:
+      type: object
+      required: [words, explanation, confidence]
+      properties:
+        words:
+          type: array
+          items:
+            type: string
+          minItems: 4
+          maxItems: 4
+        explanation:
+          type: string
+          minLength: 10
+          maxLength: 200
+        confidence:
+          type: number
+          minimum: 0.0
+          maximum: 1.0
+
+    ProcessingResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [processing]
+        estimated_completion_seconds:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "Invalid request data"
+        details:
+          type: object
+          nullable: true
+          description: Additional error context
+
+  securitySchemes:
+    SessionAuth:
+      type: apiKey
+      in: header
+      name: X-Session-ID
+      description: Session identifier for request context
+
+security:
+  - SessionAuth: []
+
+tags:
+  - name: Puzzles
+    description: Puzzle management operations
+  - name: Sessions
+    description: Game session management
+  - name: Guesses
+    description: Word group guess operations
+  - name: AI Recommendations
+    description: LLM-powered word grouping suggestions
+  - name: WebSocket
+    description: Real-time communication endpoints
