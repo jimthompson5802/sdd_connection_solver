@@ -1,0 +1,2 @@
+# Specification Driven Development (SDD): NYT Connections Puzzle Assistant Web Application
+This repository is a testbed for trying out Specification Driven Development (SDD) techniques using Github's [spec-kit](https://github.com/github/spec-kit).  This work is attempting to re-implement [this](https://github.com/jimthompson5802/connection_solver) following the [spec-kit](https://github.com/github/spec-kit) guidelines.
