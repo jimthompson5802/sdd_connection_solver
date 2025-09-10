@@ -39,7 +39,7 @@
 ## Phase 3.1: Setup
 - [x] T001 Create web application project structure (backend/ and frontend/ directories)
 - [x] T002 Initialize Python backend with FastAPI dependencies in backend/requirements.txt
-- [ ] T003 Initialize TypeScript frontend with basic HTML/CSS structure
+- [x] T003 Initialize TypeScript frontend with basic HTML/CSS structure
 - [ ] T004 [P] Configure Python linting (flake8, black, isort) in backend/.flake8, backend/pyproject.toml
 - [ ] T005 [P] Configure frontend build and WebSocket client setup in frontend/package.json
 

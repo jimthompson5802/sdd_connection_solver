@@ -1,0 +1,21 @@
+{
+  "name": "nyt-connections-puzzle-assistant",
+  "version": "1.0.0",
+  "description": "Frontend for NYT Connections Puzzle Assistant Web Application",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc && cp src/index.html dist/ && cp src/styles.css dist/",
+    "dev": "tsc --watch",
+    "serve": "python -m http.server 8080 --directory dist",
+    "clean": "rm -rf dist",
+    "start": "npm run build && npm run serve"
+  },
+  "keywords": ["nyt", "connections", "puzzle", "assistant", "typescript"],
+  "author": "SDD Connection Solver Team",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "dependencies": {}
+}
