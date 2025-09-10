@@ -183,18 +183,14 @@ curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/recommendati
 ```
 
 ### Step 7: Evaluate Recommendation as One-Away
-**User Action**: User indicates 3 out of 4 words are correct (fish theme)  
+**User Action**: User indicates 3 out of 4 words are correct but doesn't specify which ones  
 **System Action**: Track one-away information for future recommendations
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/recommendations/rec-uuid-002/evaluate \
   -H "Content-Type: application/json" \
   -d '{
-    "evaluation": "one_away",
-    "one_away_details": {
-      "likely_correct_words": ["SALMON", "COD", "TROUT"],
-      "likely_incorrect_word": "APPLE"
-    }
+    "evaluation": "one_away"
   }'
 ```
 
@@ -218,7 +214,7 @@ curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/recommendati
 
 ### Step 8: Request Third Recommendation with Context
 **User Action**: Request next recommendation  
-**System Action**: Use one-away context to generate better suggestion
+**System Action**: Use one-away context to generate better suggestion (knowing 3 of previous 4 words belong together)
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/recommendations
@@ -229,7 +225,7 @@ curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/recommendati
 {
   "id": "rec-uuid-003",
   "recommended_words": ["SALMON", "TUNA", "COD", "TROUT"],
-  "explanation": "These are all types of fish commonly eaten as seafood. Based on previous feedback, these fish are likely grouped together rather than with other organic items.",
+  "explanation": "These are all types of fish commonly eaten as seafood. Based on previous one-away feedback, these fish words are likely grouped together rather than with other items.",
   "timestamp": "2025-09-09T20:03:00Z",
   "user_evaluation": null,
   "evaluation_timestamp": null,

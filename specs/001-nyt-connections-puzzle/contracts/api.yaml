@@ -409,21 +409,6 @@ components:
           type: string
           enum: [correct, incorrect, one_away]
           description: User's evaluation of the recommendation
-        one_away_details:
-          type: object
-          nullable: true
-          description: Additional details for one-away evaluations
-          properties:
-            likely_correct_words:
-              type: array
-              items:
-                type: string
-              minItems: 3
-              maxItems: 3
-              description: The 3 words that likely belong together
-            likely_incorrect_word:
-              type: string
-              description: The 1 word that doesn't belong
 
     EvaluationResponse:
       type: object

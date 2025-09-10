@@ -123,18 +123,17 @@
 - Sum of words in all groups must not exceed 16
 
 ### OneAwayGroup  
-**Purpose**: Stores information about a group marked as one-away (3/4 words correct)
+**Purpose**: Stores information about a group marked as one-away (3/4 words correct, but unknown which)
 **Fields**:
 - `words: List[str]` - The 4 words from the one-away recommendation
 - `explanation: str` - Original explanation for why these words were grouped
-- `likely_correct_words: List[str]` - The 3 words likely to be in same actual group
-- `likely_incorrect_word: str` - The 1 word that doesn't belong
+- `marked_at: datetime` - When this was marked as one-away
 
 **Validation Rules**:
 - Must have exactly 4 words
-- `likely_correct_words` must have exactly 3 words
-- `likely_incorrect_word` must be one of the 4 words
+- `explanation` must be 10-500 characters  
 - All words must exist in original puzzle
+- System knows 3 out of 4 words belong together, but not which specific ones
 
 ## Entity Relationships
 

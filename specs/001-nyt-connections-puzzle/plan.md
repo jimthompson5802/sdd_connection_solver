@@ -39,7 +39,7 @@ A web application where users upload a CSV file with 16 words to create a puzzle
 **Target Platform**: Web application with file upload capability (browser-based frontend, server-based backend)
 **Project Type**: web (frontend + backend structure)  
 **Performance Goals**: AI recommendation generation within 2 seconds, real-time evaluation feedback  
-**Constraints**: LLM model configurable per session, one recommendation at a time, evaluation-based learning  
+**Constraints**: LLM model configurable per session, one recommendation at a time, evaluation-based learning (one-away means 3/4 correct but unknown which)  
 **Scale/Scope**: Single-user puzzle sessions, 16-word puzzles from uploaded CSV files, context-aware AI recommendations
 
 **Arguments**: 

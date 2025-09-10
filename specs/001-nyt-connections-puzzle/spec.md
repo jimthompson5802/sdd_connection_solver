@@ -64,10 +64,10 @@ A puzzle enthusiast wants to solve the NYT Connections puzzle with AI assistance
 1. **Given** a user uploads a text file with 16 comma-separated words, **When** the system is ready, **Then** it generates and displays one recommended group of 4 words, with a textual explanation of their common connection
 2. **Given** the system presents a recommended 4-word group, **When** the user indicates the group is correct, **Then** the system marks that group as correct, removes those words from the list, and updates the puzzle state
 3. **Given** the system presents a recommended 4-word group, **When** the user indicates the group is incorrect, **Then** the system marks that group as incorrect, keeps track of it, and ensures it is not recommended again
-4. **Given** the system presents a recommended 4-word group, **When** the user indicates the group is a one-away error (three of four words are connected), **Then** the system marks that group as a one-away error, keeps track of it, and uses the information that three of the four words are connected for future recommendations
+4. **Given** the system presents a recommended 4-word group, **When** the user indicates the group is a one-away error (three of four words are connected), **Then** the system marks that group as a one-away error, keeps track of it, which means three of the four words are correct, however, it is unknown which word is incorrect, and ensures the one-away group is not recommended again
 5. **Given** the user has made several group evaluations, **When** the system generates the next recommendation, **Then** it uses the updated status (remaining words, incorrect groups, one-away groups) as context for the LLM prompt
 6. **Given** a user has made 3 incorrect guesses, **When** they make their 4th incorrect guess, **Then** the system indicates a failed solution and prevents further guessing, but allows the user to view the full history of guesses
-7. **Given** a user makes an incorrect guess, **When** they mark it as "one-away", **Then** the system visually distinguishes this guess in the history as having 3 correct words
+7. **Given** a user makes an incorrect guess, **When** they mark it as "one-away", **Then** the system visually distinguishes this guess in the history as a one-away error
 8. **Given** the puzzle is failed or solved, **When** the user views the puzzle, **Then** the user can see the full history of all recommendations and their responses
 
 ### Edge Cases
@@ -102,7 +102,7 @@ A puzzle enthusiast wants to solve the NYT Connections puzzle with AI assistance
 - **FR-019**: System MUST allow the user to indicate if a recommended 4-word group is correct, incorrect, or a one-away error
 - **FR-020**: If a group is marked correct, the system MUST remove those words and update the puzzle state
 - **FR-021**: If a group is marked incorrect, the system MUST track that group and ensure it is not recommended again
-- **FR-022**: If a group is marked as a one-away error, the system MUST track that group, ensure it is not recommended again, and use the information that three of the four words are connected for future recommendations
+- **FR-022**: If a group is marked as a one-away error, the system MUST track that group, ensure it is not recommended again, and use the information that three of the four words are connected for future recommendations, however, it is unknown which three words are correct and which one is incorrect
 - **FR-023**: The system MUST use the updated status (remaining words, incorrect groups, one-away groups) as context for the LLM to generate the next recommendation
 
 ### Key Entities

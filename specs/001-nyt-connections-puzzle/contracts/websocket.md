@@ -42,18 +42,14 @@ All messages are JSON format with `type` field for message discrimination.
 {
   "type": "evaluate_recommendation",
   "recommendation_id": "uuid-string", 
-  "evaluation": "correct",
-  "one_away_details": {
-    "likely_correct_words": ["WORD1", "WORD2", "WORD3"],
-    "likely_incorrect_word": "WORD4"
-  }
+  "evaluation": "correct"
 }
 ```
 
 **Validation**:
 - `evaluation` must be "correct", "incorrect", or "one_away"  
-- `one_away_details` required only if evaluation is "one_away"
 - `recommendation_id` must match current pending recommendation
+- No additional details required for "one_away" - system knows 3/4 words are correct but not which ones
 
 ### Request Session History
 ```json

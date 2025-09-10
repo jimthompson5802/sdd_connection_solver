@@ -51,14 +51,15 @@
 
 **Decision**: Track user evaluations and use as LLM context for future recommendations
 **Rationale**:
-- One-away feedback provides valuable constraint information
+- One-away feedback indicates 3 out of 4 words belong together (without specifying which ones)
 - Incorrect evaluations prevent repeated bad suggestions
 - Context improves recommendation quality over session lifetime
-- Enables progressive puzzle solving strategy
+- Enables progressive puzzle solving strategy without requiring detailed user input
 
 **Alternatives considered**:
 - Stateless recommendations: Misses learning opportunities
-- Only track correct/incorrect: Loses valuable one-away information
+- Only track correct/incorrect: Loses valuable one-away constraint information
+- Require user to specify which 3 words in one-away: Too complex, user may not know
 - Complex ML training: Overkill for session-level learning
 
 ### 5. Context-Aware LLM Prompting System
@@ -127,8 +128,8 @@
 ### Evaluation Learning System
 1. Correct evaluation → Remove words from available pool, mark theme as solved
 2. Incorrect evaluation → Add word combination to exclusion list
-3. One-away evaluation → Track 3-correct-words constraint, exclude combination
-4. Next recommendation → Include all constraints in LLM prompt context
+3. One-away evaluation → Track that 3 out of 4 words belong together (without knowing which 3), exclude combination
+4. Next recommendation → Include all constraints in LLM prompt context, use one-away hints to bias toward related words
 
 ### File Processing Pipeline
 1. Validate file format (CSV/TXT with 16 comma-separated words)
