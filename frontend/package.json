@@ -4,18 +4,44 @@
   "description": "Frontend for NYT Connections Puzzle Assistant Web Application",
   "main": "dist/main.js",
   "scripts": {
-    "build": "tsc && cp src/index.html dist/ && cp src/styles.css dist/",
-    "dev": "tsc --watch",
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "dev": "webpack serve --mode development",
     "serve": "python -m http.server 8080 --directory dist",
     "clean": "rm -rf dist",
-    "start": "npm run build && npm run serve"
+    "start": "npm run build && npm run serve",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src/**/*.{ts,html,css}",
+    "check-format": "prettier --check src/**/*.{ts,html,css}",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:e2e": "playwright test"
   },
   "keywords": ["nyt", "connections", "puzzle", "assistant", "typescript"],
   "author": "SDD Connection Solver Team",
   "license": "MIT",
   "devDependencies": {
     "typescript": "^5.0.0",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "prettier": "^3.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "@playwright/test": "^1.40.0",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.0",
+    "webpack-dev-server": "^4.15.0",
+    "ts-loader": "^9.5.0",
+    "html-webpack-plugin": "^5.5.0",
+    "css-loader": "^6.8.0",
+    "style-loader": "^3.3.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "ws": "^8.14.0",
+    "@types/ws": "^8.5.0"
+  }
 }

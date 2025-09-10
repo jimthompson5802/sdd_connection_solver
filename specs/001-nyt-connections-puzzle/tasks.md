@@ -40,8 +40,8 @@
 - [x] T001 Create web application project structure (backend/ and frontend/ directories)
 - [x] T002 Initialize Python backend with FastAPI dependencies in backend/requirements.txt
 - [x] T003 Initialize TypeScript frontend with basic HTML/CSS structure
-- [ ] T004 [P] Configure Python linting (flake8, black, isort) in backend/.flake8, backend/pyproject.toml
-- [ ] T005 [P] Configure frontend build and WebSocket client setup in frontend/package.json
+- [x] T004 [P] Configure Python linting (flake8, black, isort) in backend/.flake8, backend/pyproject.toml
+- [x] T005 [P] Configure frontend build and WebSocket client setup in frontend/package.json
 
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
