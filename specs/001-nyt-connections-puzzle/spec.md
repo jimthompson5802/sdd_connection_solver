@@ -54,57 +54,63 @@ When creating this spec from a user prompt:
 
 ## User Scenarios & Testing
 
+#### Puzzle Initialization
+- The user uploads a text file containing 16 comma-separated words to initialize the puzzle.
+
 ### Primary User Story
-A puzzle enthusiast wants to solve the NYT Connections puzzle with AI assistance. They load the puzzle words, receive AI-generated grouping recommendations, make guesses, track their progress, and see which guesses were correct or incorrect until they solve the puzzle.
+A puzzle enthusiast wants to solve the NYT Connections puzzle with AI assistance. They upload a text file with 16 words, receive AI-generated grouping recommendations (one group at a time, with explanation), evaluate each recommendation, and track their progress until the puzzle is solved or failed.
 
 ### Acceptance Scenarios
-1. **Given** a user loads a new NYT Connections puzzle with 16 words, **When** they request AI recommendations, **Then** the system displays suggested word groupings with explanations
-2. **Given** a user selects 4 words and submits a guess, **When** the guess is correct, **Then** the system removes those words from the available pool and marks the group as solved
-3. **Given** a user selects 4 words and submits a guess, **When** the guess is incorrect, **Then** the system marks the guess as invalid and keeps the words available for future guesses
-4. **Given** a user has made several guesses, **When** they view the guess history, **Then** they can see all previous attempts with clear indication of valid vs invalid guesses
-5. **Given** a user has solved some groups, **When** they request new AI recommendations, **Then** the AI only considers the remaining unsolved words
-6. **Given** a user has made 3 incorrect guesses, **When** they make their 4th incorrect guess, **Then** the system indicates a failed solution and prevents further guessing
+1. **Given** a user uploads a text file with 16 comma-separated words, **When** the system is ready, **Then** it generates and displays one recommended group of 4 words, with a textual explanation of their common connection
+2. **Given** the system presents a recommended 4-word group, **When** the user indicates the group is correct, **Then** the system marks that group as correct, removes those words from the list, and updates the puzzle state
+3. **Given** the system presents a recommended 4-word group, **When** the user indicates the group is incorrect, **Then** the system marks that group as incorrect, keeps track of it, and ensures it is not recommended again
+4. **Given** the system presents a recommended 4-word group, **When** the user indicates the group is a one-away error (three of four words are connected), **Then** the system marks that group as a one-away error, keeps track of it, and uses the information that three of the four words are connected for future recommendations
+5. **Given** the user has made several group evaluations, **When** the system generates the next recommendation, **Then** it uses the updated status (remaining words, incorrect groups, one-away groups) as context for the LLM prompt
+6. **Given** a user has made 3 incorrect guesses, **When** they make their 4th incorrect guess, **Then** the system indicates a failed solution and prevents further guessing, but allows the user to view the full history of guesses
 7. **Given** a user makes an incorrect guess, **When** they mark it as "one-away", **Then** the system visually distinguishes this guess in the history as having 3 correct words
+8. **Given** the puzzle is failed or solved, **When** the user views the puzzle, **Then** the user can see the full history of all recommendations and their responses
 
 ### Edge Cases
-- What happens when the user tries to submit a guess with less than 4 words selected?
 - How does the system handle network failures when requesting AI recommendations?
 - What happens if the user refreshes the page mid-puzzle?
 - How does the system behave when all 4 groups are correctly identified?
 - What happens when the user reaches 4 incorrect guesses and the puzzle fails?
-- Can the user still view recommendations after failing the puzzle?
+- Can the user still view recommendations after failing the puzzle? (Yes, but cannot restart)
 - What happens if the user tries to mark a correct guess as "one-away"?
 
 ## Requirements
 
 ### Functional Requirements
-- **FR-001**: System MUST display exactly 16 puzzle words in a selectable interface
-- **FR-002**: System MUST allow users to select and deselect individual words from the puzzle
-- **FR-003**: System MUST prevent users from submitting guesses with anything other than exactly 4 selected words
-- **FR-004**: System MUST integrate with an LLM to generate word grouping recommendations
-- **FR-005**: System MUST display AI-generated recommendations in a clear, understandable format with reasoning
-- **FR-006**: System MUST record each guess attempt with the selected words and result (correct/incorrect)
-- **FR-007**: System MUST visually distinguish between correct and incorrect previous guesses in the history
+- **FR-001**: System MUST allow the user to upload a text file containing exactly 16 comma-separated words to initialize the puzzle
+- **FR-002**: System MUST display the 16 puzzle words in a selectable interface
+- **FR-003**: System MUST integrate with an LLM to generate a single recommended group of 4 words at a time
+- **FR-004**: The LLM to use MUST be a configuration parameter specified when the system is started
+- **FR-005**: System MUST display each AI-generated group recommendation with a clear, textual explanation of the connection
+- **FR-006**: System MUST record each group recommendation and the user's evaluation (correct/incorrect/one-away)
+- **FR-007**: System MUST visually distinguish between correct, incorrect, and one-away groups in the guess history
 - **FR-008**: System MUST remove correctly guessed word groups from the active puzzle area
-- **FR-009**: System MUST update the puzzle state after each correct guess, showing remaining words only
-- **FR-010**: System MUST persist user progress to prevent loss on page refresh or accidental navigation
-- **FR-011**: System MUST provide a mechanism for users to request fresh AI recommendations after each guess
+- **FR-009**: System MUST update the puzzle state after each correct group, showing remaining words only
+- **FR-010**: System MUST persist user progress and guess history to prevent loss on page refresh or accidental navigation
+- **FR-011**: System MUST provide a mechanism for the user to view the full history of group recommendations and their responses at any time
 - **FR-012**: System MUST complete AI recommendation requests and UI updates within 2 seconds
-- **FR-013**: System MUST provide an option to reset the current puzzle or start a new one
-- **FR-014**: System MUST indicate when the puzzle is fully solved (all 4 groups found)
-- **FR-015**: System MUST store user data and puzzle history securely
-- **FR-016**: System MUST limit users to exactly 4 incorrect guesses per puzzle
-- **FR-017**: System MUST indicate a failed solution when the user makes their 4th incorrect guess
-- **FR-018**: System MUST allow users to mark an incorrect guess as "one-away" (3 out of 4 words correct)
-- **FR-019**: System MUST visually distinguish one-away guesses from regular incorrect guesses in the history
-- **FR-020**: When generating recommendations, the LLM MUST identify four-word groups where each group shares a common connection such as common theme, related concepts, parts of a common item, related by common suffix or prefix, or other logical relationships
+- **FR-013**: System MUST indicate when the puzzle is fully solved (all 4 groups found)
+- **FR-014**: System MUST limit users to exactly 4 incorrect guesses per puzzle
+- **FR-015**: System MUST indicate a failed solution when the user makes their 4th incorrect guess
+- **FR-016**: System MUST allow users to mark a group as a one-away error (3 out of 4 words correct)
+- **FR-017**: System MUST visually distinguish one-away groups from regular incorrect groups in the history
+- **FR-018**: When generating recommendations, the LLM MUST always provide a textual explanation and identify a group of 4 words with a common connection (theme, concept, part, suffix/prefix, etc.)
+- **FR-019**: System MUST allow the user to indicate if a recommended 4-word group is correct, incorrect, or a one-away error
+- **FR-020**: If a group is marked correct, the system MUST remove those words and update the puzzle state
+- **FR-021**: If a group is marked incorrect, the system MUST track that group and ensure it is not recommended again
+- **FR-022**: If a group is marked as a one-away error, the system MUST track that group, ensure it is not recommended again, and use the information that three of the four words are connected for future recommendations
+- **FR-023**: The system MUST use the updated status (remaining words, incorrect groups, one-away groups) as context for the LLM to generate the next recommendation
 
 ### Key Entities
-- **Puzzle**: Contains exactly 16 words arranged in 4 hidden groups of 4 words each, with associated difficulty levels and themes
+- **Puzzle**: Contains exactly 16 user-provided words arranged in 4 hidden groups of 4 words each, with associated difficulty levels and themes
 - **Word**: Individual puzzle element with text content and group membership
-- **Guess**: User attempt containing 4 selected words, timestamp, result status (correct/incorrect/one-away), and optional AI recommendation source
+- **Recommendation**: System/LLM attempt containing 4 recommended words, timestamp, explanation, and result status (correct/incorrect/one-away)
 - **Group**: Set of 4 related words with a common theme or category, has difficulty color coding
-- **Session**: User's current puzzle-solving session including progress state, guess history, remaining words, and incorrect guess count
+- **Session**: User's current puzzle-solving session including progress state, recommendation history, remaining words, and incorrect guess count
 
 ---
 
