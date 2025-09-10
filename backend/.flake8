@@ -1,0 +1,20 @@
+[flake8]
+max-line-length = 120
+extend-ignore = 
+    # E203: whitespace before ':'
+    E203,
+    # W503: line break before binary operator
+    W503,
+    # F401: imported but unused (handled by isort)
+    F401
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    build,
+    dist,
+    *.egg-info
+per-file-ignores =
+    # Ignore unused imports in __init__.py files
+    __init__.py:F401
