@@ -29,18 +29,18 @@
 - Phase 3-4: Implementation execution (manual or via tools)
 
 ## Summary
-A web application that assists users in solving NYT Connections puzzles by providing AI-generated word grouping recommendations, tracking user guesses and progress, and managing puzzle state through a FastAPI backend with HTML/CSS/TypeScript frontend.
+A web application where users upload a CSV file with 16 words to create a puzzle, then receive one-at-a-time AI-generated word grouping recommendations that they evaluate as correct/incorrect/one-away. The system learns from evaluations to improve subsequent recommendations using configurable LLM models via FastAPI backend with HTML/TypeScript frontend.
 
 ## Technical Context
 **Language/Version**: Python 3.12+ (backend), HTML/CSS/TypeScript (frontend)  
-**Primary Dependencies**: FastAPI, uvicorn, langchain, langgraph, openai, pydantic, requests (backend)  
-**Storage**: Session-based storage for puzzle state and guess history  
+**Primary Dependencies**: FastAPI, uvicorn, langchain, langgraph, configurable LLM models (OpenAI GPT-4, Claude), pydantic, requests (backend)  
+**Storage**: In-memory session storage with file upload handling for puzzle initialization  
 **Testing**: pytest, pytest-mock (backend), playwright (E2E testing)  
-**Target Platform**: Web application (browser-based frontend, server-based backend)
+**Target Platform**: Web application with file upload capability (browser-based frontend, server-based backend)
 **Project Type**: web (frontend + backend structure)  
-**Performance Goals**: AI recommendation requests and UI updates within 2 seconds  
-**Constraints**: Exactly 4 incorrect guesses per puzzle, secure data storage  
-**Scale/Scope**: Single-user puzzle sessions, 16-word puzzles with 4 groups of 4 words each
+**Performance Goals**: AI recommendation generation within 2 seconds, real-time evaluation feedback  
+**Constraints**: LLM model configurable per session, one recommendation at a time, evaluation-based learning  
+**Scale/Scope**: Single-user puzzle sessions, 16-word puzzles from uploaded CSV files, context-aware AI recommendations
 
 **Arguments**: 
 - Python 3.12+ backend with HTML/CSS/TypeScript frontend
@@ -49,6 +49,7 @@ A web application that assists users in solving NYT Connections puzzles by provi
 - Package management: uv for package management and running scripts
 - Linting: flake8, black, isort
 - Testing: pytest for backend, playwright for E2E
+- **Key workflow changes**: File upload → one-at-a-time recommendations → user evaluation → context-aware next recommendation
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
@@ -194,24 +195,27 @@ ios/ or android/
 **Task Generation Strategy**:
 - Load `/templates/tasks-template.md` as base
 - Generate tasks from Phase 1 design docs (contracts, data model, quickstart)
-- Backend API endpoints → FastAPI route implementation tasks [P]
-- Data models → Pydantic model creation tasks [P]
-- WebSocket handlers → real-time communication tasks
-- Frontend components → TypeScript module tasks [P]
-- Integration tests → contract validation tasks
-- E2E tests → Playwright test scenarios
+- File upload endpoint → contract test + implementation tasks [P]
+- Each recommendation/evaluation endpoint → contract test task [P] 
+- Each entity (Puzzle, Session, Recommendation, etc.) → model creation task [P]
+- Context-aware LLM integration → service task with evaluation learning
+- WebSocket real-time updates → async task [P]
+- Frontend file upload + evaluation UI → implementation task
+- Integration test for complete file-to-recommendation workflow
 
 **Ordering Strategy**:
-- TDD order: Tests before implementation (contract tests → integration tests → unit tests → implementation)
-- Dependency order: Models → Services → API routes → Frontend components
-- Parallel execution: Mark [P] for independent files that can be developed concurrently
-- Critical path: AI recommendation system (backend + WebSocket + frontend integration)
+- TDD order: Contract tests → Entity models → Service implementation → Integration tests
+- Dependency order: File upload → Session management → Recommendation generation → Evaluation processing
+- Context-aware features after basic recommendation system
+- Mark [P] for parallel execution (independent files/endpoints)
 
-**Estimated Output**: 32-38 numbered, ordered tasks in tasks.md covering:
-1. Project setup and environment (5 tasks)
-2. Backend data models and validation (6 tasks) 
-3. Contract tests for all API endpoints (8 tasks)
-4. Backend service layer implementation (7 tasks)
+**Estimated Output**: 28-32 numbered, ordered tasks emphasizing:
+1. File upload and puzzle creation (4-5 tasks)
+2. Single recommendation generation with configurable LLM (6-7 tasks)  
+3. Evaluation processing and context learning (5-6 tasks)
+4. WebSocket real-time communication (4-5 tasks)
+5. Frontend upload and evaluation interface (4-5 tasks)
+6. End-to-end integration testing (4-5 tasks)
 5. WebSocket real-time communication (4 tasks)
 6. Frontend TypeScript modules (6 tasks)
 7. Integration and E2E testing (4 tasks)

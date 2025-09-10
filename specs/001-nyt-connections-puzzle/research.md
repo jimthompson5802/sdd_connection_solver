@@ -5,135 +5,135 @@
 
 ## Research Tasks
 
-### 1. LLM Integration for Word Grouping Recommendations
+### 1. File Upload and Puzzle Initialization
 
-**Decision**: Use OpenAI GPT models via langchain/langgraph integration
+**Decision**: Use multipart/form-data file upload with CSV parsing
 **Rationale**: 
-- langchain provides structured interface for LLM interactions
-- langgraph enables complex reasoning workflows for word grouping
-- OpenAI GPT models demonstrate strong performance on semantic word relationships
-- Established patterns for prompt engineering in puzzle-solving domain
+- Simple text file format accessible to non-technical users
+- Comma-separated values easily parsed and validated
+- FastAPI provides excellent file upload handling with size limits
+- No need for complex puzzle creation interface
 
 **Alternatives considered**:
-- Direct OpenAI API: Less structured, harder to maintain prompts
-- Local models (Ollama): Latency issues, lower accuracy for semantic reasoning
-- Anthropic Claude: Good performance but less langchain integration
+- Manual word entry form: More cumbersome for 16 words
+- JSON file upload: Less user-friendly format
+- Database of pre-created puzzles: Doesn't meet custom puzzle requirement
 
-### 2. Frontend-Backend Communication for Real-time Updates
+### 2. LLM Model Configuration
 
-**Decision**: REST API with JSON responses + WebSocket for real-time updates
+**Decision**: Runtime LLM model selection via session creation parameter
 **Rationale**:
-- FastAPI provides excellent WebSocket support alongside REST endpoints
-- REST for stateless operations (submit guess, get puzzle)
-- WebSocket for real-time AI recommendation streaming
-- Simple to test and debug compared to GraphQL
+- Allows users to choose based on cost/performance preferences
+- Easy to add new models without code changes
+- Configuration isolated per session for A/B testing
+- Environment variable fallback for default model
 
 **Alternatives considered**:
-- Pure REST: Would require polling for AI recommendation status
-- GraphQL: Overkill for simple CRUD operations
-- Server-sent events: Less bidirectional than WebSocket
+- Global server configuration: Less flexible for users
+- Per-request model selection: Too granular, complicates state
+- Multiple endpoints per model: Increases API complexity
 
-### 3. Session Management and Puzzle State Persistence
+### 3. Single Recommendation Workflow
 
-**Decision**: In-memory session storage with Redis-like interface (can use in-memory dict for MVP)
+**Decision**: Generate and evaluate one recommendation at a time
 **Rationale**:
-- Puzzle sessions are temporary (single-session gameplay)
-- No need for permanent user accounts or cross-session persistence
-- Fast access for real-time guess tracking
-- Easy to scale to Redis later if needed
+- Simpler user interface - clear focus on current recommendation
+- Better LLM context utilization - learns from each evaluation
+- Reduced API costs - only generate what's needed
+- Natural conversation flow - mimics human puzzle-solving
 
 **Alternatives considered**:
-- Database persistence: Overkill for temporary puzzle sessions
-- Browser localStorage only: Would lose state on server restart
-- File-based storage: Slower and unnecessary complexity
+- Multiple simultaneous recommendations: Overwhelming UI, higher costs
+- Batch processing: Doesn't leverage user feedback effectively
+- User-initiated bulk recommendations: Complex state management
 
-### 4. AI Recommendation System Architecture
+### 4. Evaluation-Based Learning System
 
-**Decision**: Async task queue for AI recommendations with result caching
+**Decision**: Track user evaluations and use as LLM context for future recommendations
 **Rationale**:
-- Meets <2 second response requirement through caching
-- Async processing prevents UI blocking
-- Cache common word patterns to reduce API calls
-- Background task can continue even if user disconnects
+- One-away feedback provides valuable constraint information
+- Incorrect evaluations prevent repeated bad suggestions
+- Context improves recommendation quality over session lifetime
+- Enables progressive puzzle solving strategy
 
 **Alternatives considered**:
-- Synchronous AI calls: Would block UI, fail 2-second requirement
-- Pre-computed recommendations: Not feasible for arbitrary puzzle inputs
-- Client-side AI: Model size and latency issues
+- Stateless recommendations: Misses learning opportunities
+- Only track correct/incorrect: Loses valuable one-away information
+- Complex ML training: Overkill for session-level learning
 
-### 5. Frontend Technology Stack
+### 5. Context-Aware LLM Prompting System
 
-**Decision**: Vanilla TypeScript with modern ES modules, no framework
+**Decision**: Dynamic prompt generation with evaluation history and one-away constraints
 **Rationale**:
-- Simple puzzle interface doesn't require complex state management
-- Faster load times and simpler debugging
-- Direct DOM manipulation adequate for word selection UI
-- Easy WebSocket integration without framework overhead
+- Incorporates previous incorrect/one-away feedback into new recommendations
+- Uses structured prompt templates with variable context injection
+- Maintains context about remaining words and solved groups
+- Enables progressive puzzle-solving strategy
 
 **Alternatives considered**:
-- React: Overkill for simple word selection interface
-- Vue: Adds complexity without significant benefit
-- Web Components: Good choice but vanilla TS simpler for this scope
+- Static prompts: Misses valuable user feedback context
+- Complex prompt chaining: Slower and more expensive
+- Separate model fine-tuning: Overkill for session-level learning
 
-### 6. Testing Strategy for AI Components
+### 6. Frontend Technology for File Upload and Evaluation Interface
 
-**Decision**: Mock AI responses for unit tests, real API calls for integration tests
+**Decision**: HTML5 file input with vanilla TypeScript for evaluation workflow
 **Rationale**:
-- Fast, reliable unit tests with predictable AI responses
-- Integration tests validate actual LLM performance
-- Contract tests ensure API response schemas match expectations
-- Playwright E2E tests validate full user workflow
+- Native file upload handling with drag-and-drop support
+- Simple evaluation buttons (Correct/Incorrect/One-Away) don't require framework
+- Real-time updates via WebSocket without complex state management
+- Progressive enhancement approach works across devices
 
 **Alternatives considered**:
-- Only real API calls: Slow tests, API costs, non-deterministic
-- Only mocked responses: Would miss actual LLM performance issues
-- Separate AI service: Adds architectural complexity
+- React with file upload library: Adds complexity for simple upload flow
+- Vue.js: Overkill for evaluation interface
+- Pure HTML forms: Lacks real-time feedback capabilities
 
-### 7. Error Handling for LLM Failures
+### 7. WebSocket Integration for Real-time Updates
 
-**Decision**: Graceful degradation with cached suggestions and user messaging
+**Decision**: WebSocket for recommendation generation status and evaluation results
 **Rationale**:
-- API failures should not break puzzle functionality
-- Show cached/fallback recommendations when AI unavailable
-- Clear user messaging about AI status
-- Retry logic with exponential backoff
+- Real-time progress updates during LLM processing
+- Immediate feedback when evaluations are processed
+- Bidirectional communication for history requests
+- Better user experience than polling
 
 **Alternatives considered**:
-- Fail fast on AI errors: Poor user experience
-- Silent failures: Users wouldn't understand missing recommendations
-- Synchronous retries: Could exceed 2-second response time
+- Server-sent events: One-way communication insufficient
+- Polling REST endpoints: Poor user experience, higher server load
+- Long-polling: More complex than WebSocket for real-time needs
 
 ## Technical Decisions Summary
 
 | Component | Technology | Rationale |
 |-----------|------------|-----------|
-| Backend Framework | FastAPI + uvicorn | Async support, WebSocket, auto documentation |
-| LLM Integration | langchain + langgraph + OpenAI | Structured LLM workflows, proven performance |
-| Frontend | Vanilla TypeScript | Simple UI needs, no framework overhead |
-| Session Storage | In-memory (Redis interface) | Temporary sessions, fast access |
-| Communication | REST + WebSocket | REST for CRUD, WebSocket for real-time |
-| Testing | pytest + playwright + contract tests | TDD workflow, real dependencies |
-| Package Management | uv | Fast installs, modern Python packaging |
+| File Upload | HTML5 + multipart/form-data | Native support, user-friendly |
+| Backend Framework | FastAPI + uvicorn | File upload, WebSocket, async support |
+| LLM Integration | langchain + configurable models | Structured prompts, model flexibility |
+| Session Storage | In-memory with persistence hooks | Fast access, easy Redis migration |
+| Frontend | Vanilla TypeScript + WebSocket | Simple needs, real-time capability |
+| Communication | REST + WebSocket | CRUD operations + real-time updates |
+| Context Management | Dynamic prompt templates | Learning from user feedback |
 
 ## Implementation Patterns
 
-### AI Recommendation Flow
-1. User requests recommendations → WebSocket connection established
-2. Background task: LLM query with puzzle context
-3. Stream partial results to frontend as available
-4. Cache final results for subsequent requests
-5. Handle failures gracefully with fallback suggestions
+### Recommendation Generation Flow
+1. User uploads file → Parse CSV → Create puzzle
+2. User creates session with LLM model choice
+3. User requests recommendation → Generate context from history
+4. LLM processes context → Stream progress via WebSocket
+5. User evaluates recommendation → Update context for next round
 
-### Puzzle State Management
-1. Immutable puzzle state objects
-2. Event-driven state updates (guess submitted, group solved)
-3. Session persistence for browser refresh handling
-4. Atomic operations for guess counting and validation
+### Evaluation Learning System
+1. Correct evaluation → Remove words from available pool, mark theme as solved
+2. Incorrect evaluation → Add word combination to exclusion list
+3. One-away evaluation → Track 3-correct-words constraint, exclude combination
+4. Next recommendation → Include all constraints in LLM prompt context
 
-### Testing Approach
-1. Contract tests → validate API schemas first
-2. Integration tests → test LLM integration with real calls
-3. Unit tests → individual component logic with mocks
-4. E2E tests → full user workflows with Playwright
+### File Processing Pipeline
+1. Validate file format (CSV/TXT with 16 comma-separated words)
+2. Parse and clean words (trim whitespace, validate uniqueness)
+3. Create puzzle entity with uploaded filename tracking
+4. Return puzzle ID for session creation
 
 All research tasks completed. No NEEDS CLARIFICATION items remaining.

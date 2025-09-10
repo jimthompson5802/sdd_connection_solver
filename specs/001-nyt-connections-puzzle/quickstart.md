@@ -1,7 +1,7 @@
 # Quickstart Guide: NYT Connections Puzzle Assistant
 
 **Version**: 1.0.0  
-**Last Updated**: September 8, 2025  
+**Last Updated**: September 9, 2025  
 
 This guide walks through the complete user workflow for the NYT Connections Puzzle Assistant, providing step-by-step API interactions and expected responses.
 
@@ -9,44 +9,22 @@ This guide walks through the complete user workflow for the NYT Connections Puzz
 
 - Backend server running on `localhost:8000`
 - Frontend served from `localhost:3000` (or static files)
-- Valid puzzle data loaded in the system
+- LLM model configured (e.g., OpenAI GPT-4 or Claude)
 
 ## User Story Walkthrough
 
-### Step 1: Load a New Puzzle
-**User Action**: User opens the web application  
-**System Action**: Create a new puzzle and session
+### Step 1: Upload a Puzzle File
+**User Action**: User uploads a text file with 16 comma-separated words  
+**System Action**: Create puzzle from uploaded file
 
 ```bash
-# Create a puzzle with 16 words
-curl -X POST http://localhost:8000/api/v1/puzzles \
-  -H "Content-Type: application/json" \
-  -d '{
-    "words": ["BASS", "PIANO", "GUITAR", "DRUMS", "SALMON", "TUNA", "COD", "TROUT", "YELLOW", "BLUE", "RED", "GREEN", "APPLE", "ORANGE", "BANANA", "GRAPE"],
-    "groups": [
-      {
-        "theme": "Musical Instruments",
-        "difficulty": "yellow", 
-        "word_indices": [0, 1, 2, 3]
-      },
-      {
-        "theme": "Types of Fish",
-        "difficulty": "green",
-        "word_indices": [4, 5, 6, 7] 
-      },
-      {
-        "theme": "Colors",
-        "difficulty": "blue",
-        "word_indices": [8, 9, 10, 11]
-      },
-      {
-        "theme": "Fruits",
-        "difficulty": "purple",
-        "word_indices": [12, 13, 14, 15]
-      }
-    ],
-    "difficulty_level": "medium"
-  }'
+# Create a puzzle by uploading a text file
+curl -X POST http://localhost:8000/api/v1/puzzles/upload \
+  -F "file=@puzzle_words.txt" \
+  -F "user_id=user-123"
+
+# Contents of puzzle_words.txt:
+# BASS,PIANO,GUITAR,DRUMS,SALMON,TUNA,COD,TROUT,YELLOW,BLUE,RED,GREEN,APPLE,ORANGE,BANANA,GRAPE
 ```
 
 **Expected Response**:
@@ -54,21 +32,24 @@ curl -X POST http://localhost:8000/api/v1/puzzles \
 {
   "id": "puzzle-uuid-123",
   "words": ["BASS", "PIANO", "GUITAR", "DRUMS", "SALMON", "TUNA", "COD", "TROUT", "YELLOW", "BLUE", "RED", "GREEN", "APPLE", "ORANGE", "BANANA", "GRAPE"],
-  "created_at": "2025-09-08T20:00:00Z",
-  "difficulty_level": "medium"
+  "uploaded_filename": "puzzle_words.txt",
+  "created_at": "2025-09-09T20:00:00Z",
+  "user_id": "user-123"
 }
 ```
 
-### Step 2: Start a Game Session
-**User Action**: Begin solving the puzzle  
-**System Action**: Create session and display 16 words
+### Step 2: Start a Game Session with LLM Configuration
+**User Action**: Begin solving the puzzle with chosen LLM model  
+**System Action**: Create session with LLM configuration
 
 ```bash
-# Create session for the puzzle
+# Create session for the puzzle with LLM model choice
 curl -X POST http://localhost:8000/api/v1/sessions \
   -H "Content-Type: application/json" \
   -d '{
-    "puzzle_id": "puzzle-uuid-123"
+    "puzzle_id": "puzzle-uuid-123",
+    "llm_model": "gpt-4",
+    "user_id": "user-123"
   }'
 ```
 
@@ -77,104 +58,79 @@ curl -X POST http://localhost:8000/api/v1/sessions \
 {
   "id": "session-uuid-456", 
   "puzzle_id": "puzzle-uuid-123",
-  "start_time": "2025-09-08T20:01:00Z",
-  "last_activity": "2025-09-08T20:01:00Z",
+  "start_time": "2025-09-09T20:01:00Z",
+  "last_activity": "2025-09-09T20:01:00Z",
   "status": "active",
   "remaining_words": ["BASS", "PIANO", "GUITAR", "DRUMS", "SALMON", "TUNA", "COD", "TROUT", "YELLOW", "BLUE", "RED", "GREEN", "APPLE", "ORANGE", "BANANA", "GRAPE"],
-  "incorrect_guess_count": 0,
+  "incorrect_evaluation_count": 0,
   "solved_groups_count": 0,
   "solved_groups": [],
-  "can_make_guess": true
+  "can_request_recommendation": true,
+  "pending_recommendation_id": null,
+  "llm_model_config": "gpt-4"
 }
 ```
 
-### Step 3: Request AI Recommendations
-**User Action**: Click "Get AI Help" button  
-**System Action**: Generate word grouping suggestions
+### Step 3: Request First AI Recommendation
+**User Action**: Click "Get AI Recommendation" button  
+**System Action**: Generate single word grouping suggestion
 
 ```bash
-# Request recommendations
+# Request first recommendation
 curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/recommendations
-```
-
-**Expected Response** (Async request accepted):
-```json
-{
-  "request_id": "rec-uuid-789",
-  "status": "processing",
-  "estimated_completion_seconds": 2
-}
-```
-
-**Fetch recommendations after processing**:
-```bash
-curl http://localhost:8000/api/v1/sessions/session-uuid-456/recommendations
 ```
 
 **Expected Response**:
 ```json
 {
-  "id": "rec-uuid-789",
-  "recommendations": [
-    {
-      "words": ["BASS", "PIANO", "GUITAR", "DRUMS"],
-      "explanation": "These are all musical instruments commonly used in bands and orchestras",
-      "confidence": 0.95
-    },
-    {
-      "words": ["SALMON", "TUNA", "COD", "TROUT"], 
-      "explanation": "These are all types of fish commonly eaten as food",
-      "confidence": 0.88
-    },
-    {
-      "words": ["APPLE", "ORANGE", "BANANA", "GRAPE"],
-      "explanation": "These are all common fruits",
-      "confidence": 0.82
-    }
-  ],
-  "timestamp": "2025-09-08T20:01:02Z",
-  "confidence_scores": {
-    "recommendation_0": 0.95,
-    "recommendation_1": 0.88, 
-    "recommendation_2": 0.82
-  },
-  "processing_time_ms": 1850,
-  "llm_model": "gpt-4"
+  "id": "rec-uuid-001",
+  "recommended_words": ["BASS", "PIANO", "GUITAR", "DRUMS"],
+  "explanation": "These are all musical instruments commonly used in bands and orchestras. They represent different categories: BASS (string/low frequency), PIANO (keyboard), GUITAR (string), and DRUMS (percussion).",
+  "timestamp": "2025-09-09T20:01:02Z",
+  "user_evaluation": null,
+  "evaluation_timestamp": null,
+  "llm_model": "gpt-4",
+  "processing_time_ms": 1850
 }
 ```
 
-### Step 4: Make a Correct Guess
-**User Action**: Select "BASS", "PIANO", "GUITAR", "DRUMS" and submit  
-**System Action**: Validate guess and update game state
+### Step 4: Evaluate Recommendation as Correct
+**User Action**: User indicates the recommendation is correct  
+**System Action**: Mark group as solved and update game state
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/guesses \
+curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/recommendations/rec-uuid-001/evaluate \
   -H "Content-Type: application/json" \
   -d '{
-    "selected_words": ["BASS", "PIANO", "GUITAR", "DRUMS"],
-    "ai_recommendation_id": "rec-uuid-789"
+    "evaluation": "correct"
   }'
 ```
 
 **Expected Response**:
 ```json
 {
-  "id": "guess-uuid-001",
-  "selected_words": ["BASS", "PIANO", "GUITAR", "DRUMS"],
-  "result": "correct",
-  "timestamp": "2025-09-08T20:01:05Z",
-  "matched_group": {
+  "recommendation": {
+    "id": "rec-uuid-001",
+    "recommended_words": ["BASS", "PIANO", "GUITAR", "DRUMS"],
+    "explanation": "These are all musical instruments commonly used in bands and orchestras...",
+    "user_evaluation": "correct",
+    "evaluation_timestamp": "2025-09-09T20:01:05Z",
+    "llm_model": "gpt-4",
+    "processing_time_ms": 1850
+  },
+  "session_status": "active",
+  "next_action": "request_next_recommendation",
+  "solved_group": {
     "theme": "Musical Instruments",
     "difficulty": "yellow",
     "words": ["BASS", "PIANO", "GUITAR", "DRUMS"]
-  },
-  "session_status": "active"
+  }
 }
 ```
 
 ### Step 5: Verify Updated Session State
-**User Action**: UI updates to remove solved words  
-**System Action**: Session reflects new state
+**User Action**: UI updates to show progress  
+**System Action**: Session reflects new state with remaining words
 
 ```bash
 curl http://localhost:8000/api/v1/sessions/session-uuid-456
@@ -185,11 +141,11 @@ curl http://localhost:8000/api/v1/sessions/session-uuid-456
 {
   "id": "session-uuid-456",
   "puzzle_id": "puzzle-uuid-123", 
-  "start_time": "2025-09-08T20:01:00Z",
-  "last_activity": "2025-09-08T20:01:05Z",
+  "start_time": "2025-09-09T20:01:00Z",
+  "last_activity": "2025-09-09T20:01:05Z",
   "status": "active",
   "remaining_words": ["SALMON", "TUNA", "COD", "TROUT", "YELLOW", "BLUE", "RED", "GREEN", "APPLE", "ORANGE", "BANANA", "GRAPE"],
-  "incorrect_guess_count": 0,
+  "incorrect_evaluation_count": 0,
   "solved_groups_count": 1,
   "solved_groups": [
     {
@@ -198,96 +154,137 @@ curl http://localhost:8000/api/v1/sessions/session-uuid-456
       "words": ["BASS", "PIANO", "GUITAR", "DRUMS"]
     }
   ],
-  "can_make_guess": true
+  "can_request_recommendation": true,
+  "pending_recommendation_id": null,
+  "llm_model_config": "gpt-4"
 }
 ```
 
-### Step 6: Make an Incorrect Guess
-**User Action**: Select "YELLOW", "APPLE", "SALMON", "PIANO" and submit  
-**System Action**: Mark guess as incorrect, increment counter
+### Step 6: Request Second Recommendation
+**User Action**: Request next AI suggestion  
+**System Action**: Generate recommendation based on remaining words and context
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/guesses \
+curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/recommendations
+```
+
+**Expected Response**:
+```json
+{
+  "id": "rec-uuid-002",
+  "recommended_words": ["SALMON", "APPLE", "COD", "YELLOW"],
+  "explanation": "These are all organic, natural items that can be found in nature and are commonly consumed or used by humans.",
+  "timestamp": "2025-09-09T20:02:00Z",
+  "user_evaluation": null,
+  "evaluation_timestamp": null,
+  "llm_model": "gpt-4",
+  "processing_time_ms": 1650
+}
+```
+
+### Step 7: Evaluate Recommendation as One-Away
+**User Action**: User indicates 3 out of 4 words are correct (fish theme)  
+**System Action**: Track one-away information for future recommendations
+
+```bash
+curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/recommendations/rec-uuid-002/evaluate \
   -H "Content-Type: application/json" \
   -d '{
-    "selected_words": ["YELLOW", "APPLE", "SALMON", "PIANO"]
-  }'
-```
-
-**Expected Response**:
-```json
-{
-  "id": "guess-uuid-002",
-  "selected_words": ["YELLOW", "APPLE", "SALMON", "PIANO"],
-  "result": "incorrect", 
-  "timestamp": "2025-09-08T20:02:00Z",
-  "matched_group": null,
-  "session_status": "active"
-}
-```
-
-### Step 7: Make a "One-Away" Guess  
-**User Action**: Select "SALMON", "TUNA", "COD", "APPLE" (3 fish + 1 fruit)  
-**System Action**: Mark as one-away
-
-```bash
-curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/guesses \
-  -H "Content-Type: application/json" \
-  -d '{
-    "selected_words": ["SALMON", "TUNA", "COD", "APPLE"]
-  }'
-```
-
-**Expected Response**:
-```json
-{
-  "id": "guess-uuid-003",
-  "selected_words": ["SALMON", "TUNA", "COD", "APPLE"],
-  "result": "one_away",
-  "timestamp": "2025-09-08T20:02:30Z", 
-  "matched_group": null,
-  "session_status": "active"
-}
-```
-
-### Step 8: View Guess History
-**User Action**: Check previous attempts  
-**System Action**: Return chronological guess list
-
-```bash
-curl http://localhost:8000/api/v1/sessions/session-uuid-456/guesses
-```
-
-**Expected Response**:
-```json
-{
-  "guesses": [
-    {
-      "id": "guess-uuid-001",
-      "selected_words": ["BASS", "PIANO", "GUITAR", "DRUMS"],
-      "result": "correct",
-      "timestamp": "2025-09-08T20:01:05Z",
-      "matched_group": {
-        "theme": "Musical Instruments",
-        "difficulty": "yellow", 
-        "words": ["BASS", "PIANO", "GUITAR", "DRUMS"]
-      }
-    },
-    {
-      "id": "guess-uuid-002", 
-      "selected_words": ["YELLOW", "APPLE", "SALMON", "PIANO"],
-      "result": "incorrect",
-      "timestamp": "2025-09-08T20:02:00Z",
-      "matched_group": null
-    },
-    {
-      "id": "guess-uuid-003",
-      "selected_words": ["SALMON", "TUNA", "COD", "APPLE"], 
-      "result": "one_away",
-      "timestamp": "2025-09-08T20:02:30Z",
-      "matched_group": null
+    "evaluation": "one_away",
+    "one_away_details": {
+      "likely_correct_words": ["SALMON", "COD", "TROUT"],
+      "likely_incorrect_word": "APPLE"
     }
-  ]
+  }'
+```
+
+**Expected Response**:
+```json
+{
+  "recommendation": {
+    "id": "rec-uuid-002",
+    "recommended_words": ["SALMON", "APPLE", "COD", "YELLOW"],
+    "explanation": "These are all organic, natural items...",
+    "user_evaluation": "one_away",
+    "evaluation_timestamp": "2025-09-09T20:02:30Z",
+    "llm_model": "gpt-4",
+    "processing_time_ms": 1650
+  },
+  "session_status": "active",
+  "next_action": "request_next_recommendation",
+  "solved_group": null
+}
+```
+
+### Step 8: Request Third Recommendation with Context
+**User Action**: Request next recommendation  
+**System Action**: Use one-away context to generate better suggestion
+
+```bash
+curl -X POST http://localhost:8000/api/v1/sessions/session-uuid-456/recommendations
+```
+
+**Expected Response**:
+```json
+{
+  "id": "rec-uuid-003",
+  "recommended_words": ["SALMON", "TUNA", "COD", "TROUT"],
+  "explanation": "These are all types of fish commonly eaten as seafood. Based on previous feedback, these fish are likely grouped together rather than with other organic items.",
+  "timestamp": "2025-09-09T20:03:00Z",
+  "user_evaluation": null,
+  "evaluation_timestamp": null,
+  "llm_model": "gpt-4",
+  "processing_time_ms": 1200
+}
+```
+
+### Step 9: View Complete Recommendation History
+**User Action**: Check all previous recommendations and evaluations  
+**System Action**: Return chronological history with summary
+
+```bash
+curl http://localhost:8000/api/v1/sessions/session-uuid-456/history
+```
+
+**Expected Response**:
+```json
+{
+  "recommendations": [
+    {
+      "id": "rec-uuid-001",
+      "recommended_words": ["BASS", "PIANO", "GUITAR", "DRUMS"],
+      "explanation": "These are all musical instruments...",
+      "user_evaluation": "correct",
+      "evaluation_timestamp": "2025-09-09T20:01:05Z",
+      "llm_model": "gpt-4",
+      "processing_time_ms": 1850
+    },
+    {
+      "id": "rec-uuid-002", 
+      "recommended_words": ["SALMON", "APPLE", "COD", "YELLOW"],
+      "explanation": "These are all organic, natural items...",
+      "user_evaluation": "one_away",
+      "evaluation_timestamp": "2025-09-09T20:02:30Z",
+      "llm_model": "gpt-4",
+      "processing_time_ms": 1650
+    },
+    {
+      "id": "rec-uuid-003",
+      "recommended_words": ["SALMON", "TUNA", "COD", "TROUT"],
+      "explanation": "These are all types of fish...",
+      "user_evaluation": null,
+      "evaluation_timestamp": null,
+      "llm_model": "gpt-4",
+      "processing_time_ms": 1200
+    }
+  ],
+  "session_summary": {
+    "total_recommendations": 3,
+    "correct_evaluations": 1,
+    "incorrect_evaluations": 0,
+    "one_away_evaluations": 1,
+    "session_duration_minutes": 2.0
+  }
 }
 ```
 

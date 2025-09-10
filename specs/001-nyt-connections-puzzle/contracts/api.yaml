@@ -12,26 +12,35 @@ servers:
     description: Local development server
 
 paths:
-  /api/v1/puzzles:
+  /api/v1/puzzles/upload:
     post:
-      summary: Create a new puzzle
-      operationId: createPuzzle
+      summary: Upload a text file with 16 words to create a puzzle
+      operationId: uploadPuzzle
       tags: [Puzzles]
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreatePuzzleRequest'
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Text file containing 16 comma-separated words
+                user_id:
+                  type: string
+                  description: Optional user identifier
       responses:
         '201':
-          description: Puzzle created successfully
+          description: Puzzle created successfully from uploaded file
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PuzzleResponse'
         '400':
-          description: Invalid puzzle data
+          description: Invalid file format or word count
           content:
             application/json:
               schema:
@@ -114,13 +123,76 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /api/v1/sessions/{session_id}/guesses:
+  /api/v1/sessions/{session_id}/recommendations:
     post:
-      summary: Submit a word group guess
-      operationId: submitGuess
-      tags: [Guesses]
+      summary: Generate next AI recommendation for current puzzle state
+      operationId: generateRecommendation
+      tags: [AI Recommendations]
       parameters:
         - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '201':
+          description: New recommendation generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationResponse'
+        '400':
+          description: Invalid session state for recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Pending recommendation already exists, must evaluate first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: Get current pending recommendation
+      operationId: getCurrentRecommendation
+      tags: [AI Recommendations]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Current recommendation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationResponse'
+        '404':
+          description: No pending recommendation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/sessions/{session_id}/recommendations/{recommendation_id}/evaluate:
+    post:
+      summary: Evaluate an AI recommendation as correct, incorrect, or one-away
+      operationId: evaluateRecommendation
+      tags: [AI Recommendations]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: recommendation_id
           in: path
           required: true
           schema:
@@ -131,31 +203,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubmitGuessRequest'
+              $ref: '#/components/schemas/EvaluateRecommendationRequest'
       responses:
-        '201':
-          description: Guess submitted and evaluated
+        '200':
+          description: Recommendation evaluated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GuessResponse'
+                $ref: '#/components/schemas/EvaluationResponse'
         '400':
-          description: Invalid guess data
+          description: Invalid evaluation data
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Cannot make guess (game over or invalid state)
+        '404':
+          description: Recommendation not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/sessions/{session_id}/history:
     get:
-      summary: Get guess history for session
-      operationId: getGuessHistory
-      tags: [Guesses]
+      summary: Get complete recommendation history for session
+      operationId: getRecommendationHistory
+      tags: [History]
       parameters:
         - name: session_id
           in: path
@@ -165,62 +238,11 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Guess history
+          description: Recommendation history
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GuessHistoryResponse'
-
-  /api/v1/sessions/{session_id}/recommendations:
-    post:
-      summary: Request AI recommendations for current puzzle state
-      operationId: requestRecommendations
-      tags: [AI Recommendations]
-      parameters:
-        - name: session_id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '202':
-          description: Recommendation request accepted, processing async
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RecommendationRequestResponse'
-        '400':
-          description: Invalid session state for recommendations
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-    get:
-      summary: Get latest AI recommendations
-      operationId: getRecommendations
-      tags: [AI Recommendations]
-      parameters:
-        - name: session_id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: AI recommendations
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RecommendationsResponse'
-        '202':
-          description: Recommendations still processing
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProcessingResponse'
+                $ref: '#/components/schemas/RecommendationHistoryResponse'
 
   /ws/sessions/{session_id}/recommendations:
     get:
@@ -243,53 +265,9 @@ paths:
 
 components:
   schemas:
-    CreatePuzzleRequest:
-      type: object
-      required: [words, groups]
-      properties:
-        words:
-          type: array
-          items:
-            type: string
-          minItems: 16
-          maxItems: 16
-          example: ["BASS", "PIANO", "GUITAR", "DRUMS", "SALMON", "TUNA", "COD", "TROUT", "YELLOW", "BLUE", "RED", "GREEN", "APPLE", "ORANGE", "BANANA", "GRAPE"]
-        groups:
-          type: array
-          items:
-            $ref: '#/components/schemas/GroupDefinition'
-          minItems: 4
-          maxItems: 4
-        difficulty_level:
-          type: string
-          enum: [easy, medium, hard, expert]
-          default: medium
-
-    GroupDefinition:
-      type: object
-      required: [theme, difficulty, word_indices]
-      properties:
-        theme:
-          type: string
-          minLength: 3
-          maxLength: 50
-          example: "Musical Instruments"
-        difficulty:
-          type: string
-          enum: [yellow, green, blue, purple]
-        word_indices:
-          type: array
-          items:
-            type: integer
-            minimum: 0
-            maximum: 15
-          minItems: 4
-          maxItems: 4
-          example: [0, 1, 2, 3]
-
     PuzzleResponse:
       type: object
-      required: [id, words, created_at, difficulty_level]
+      required: [id, words, uploaded_filename, created_at]
       properties:
         id:
           type: string
@@ -300,27 +278,34 @@ components:
             type: string
           minItems: 16
           maxItems: 16
+        uploaded_filename:
+          type: string
+          description: Original filename of uploaded text file
         created_at:
           type: string
           format: date-time
-        difficulty_level:
+        user_id:
           type: string
-          enum: [easy, medium, hard, expert]
+          nullable: true
 
     CreateSessionRequest:
       type: object
-      required: [puzzle_id]
+      required: [puzzle_id, llm_model]
       properties:
         puzzle_id:
           type: string
           format: uuid
+        llm_model:
+          type: string
+          enum: [gpt-4, gpt-3.5-turbo, claude-3-sonnet, claude-3-haiku]
+          description: LLM model to use for recommendations
         user_id:
           type: string
           nullable: true
 
     SessionResponse:
       type: object
-      required: [id, puzzle_id, start_time, last_activity, status, remaining_words, incorrect_guess_count, solved_groups_count, can_make_guess]
+      required: [id, puzzle_id, start_time, last_activity, status, remaining_words, incorrect_evaluation_count, solved_groups_count, can_request_recommendation, llm_model_config]
       properties:
         id:
           type: string
@@ -341,7 +326,7 @@ components:
           type: array
           items:
             type: string
-        incorrect_guess_count:
+        incorrect_evaluation_count:
           type: integer
           minimum: 0
           maximum: 4
@@ -353,9 +338,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SolvedGroup'
-        can_make_guess:
+        can_request_recommendation:
           type: boolean
-          description: Whether user can make another guess
+          description: Whether user can request next recommendation
+        pending_recommendation_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of current unevaluated recommendation
+        llm_model_config:
+          type: string
+          description: Configured LLM model for this session
 
     SolvedGroup:
       type: object
@@ -373,104 +366,14 @@ components:
           minItems: 4
           maxItems: 4
 
-    SubmitGuessRequest:
+    RecommendationResponse:
       type: object
-      required: [selected_words]
-      properties:
-        selected_words:
-          type: array
-          items:
-            type: string
-          minItems: 4
-          maxItems: 4
-        ai_recommendation_id:
-          type: string
-          format: uuid
-          nullable: true
-          description: ID of AI recommendation that influenced this guess
-
-    GuessResponse:
-      type: object
-      required: [id, selected_words, result, timestamp]
+      required: [id, recommended_words, explanation, timestamp, llm_model, processing_time_ms]
       properties:
         id:
           type: string
           format: uuid
-        selected_words:
-          type: array
-          items:
-            type: string
-          minItems: 4
-          maxItems: 4
-        result:
-          type: string
-          enum: [correct, incorrect, one_away]
-        timestamp:
-          type: string
-          format: date-time
-        matched_group:
-          $ref: '#/components/schemas/SolvedGroup'
-          nullable: true
-        session_status:
-          type: string
-          enum: [active, completed, failed]
-          description: Updated session status after this guess
-
-    GuessHistoryResponse:
-      type: object
-      required: [guesses]
-      properties:
-        guesses:
-          type: array
-          items:
-            $ref: '#/components/schemas/GuessResponse'
-
-    RecommendationRequestResponse:
-      type: object
-      required: [request_id, status]
-      properties:
-        request_id:
-          type: string
-          format: uuid
-        status:
-          type: string
-          enum: [processing]
-        estimated_completion_seconds:
-          type: integer
-          minimum: 1
-          maximum: 10
-
-    RecommendationsResponse:
-      type: object
-      required: [id, recommendations, timestamp, confidence_scores]
-      properties:
-        id:
-          type: string
-          format: uuid
-        recommendations:
-          type: array
-          items:
-            $ref: '#/components/schemas/RecommendationGroup'
-        timestamp:
-          type: string
-          format: date-time
-        confidence_scores:
-          type: object
-          additionalProperties:
-            type: number
-            minimum: 0.0
-            maximum: 1.0
-        processing_time_ms:
-          type: integer
-          minimum: 1
-        llm_model:
-          type: string
-
-    RecommendationGroup:
-      type: object
-      required: [words, explanation, confidence]
-      properties:
-        words:
+        recommended_words:
           type: array
           items:
             type: string
@@ -479,21 +382,92 @@ components:
         explanation:
           type: string
           minLength: 10
-          maxLength: 200
-        confidence:
-          type: number
-          minimum: 0.0
-          maximum: 1.0
-
-    ProcessingResponse:
-      type: object
-      required: [status]
-      properties:
-        status:
+          maxLength: 500
+        timestamp:
           type: string
-          enum: [processing]
-        estimated_completion_seconds:
+          format: date-time
+        user_evaluation:
+          type: string
+          enum: [correct, incorrect, one_away]
+          nullable: true
+          description: User's evaluation (null if pending)
+        evaluation_timestamp:
+          type: string
+          format: date-time
+          nullable: true
+        llm_model:
+          type: string
+        processing_time_ms:
           type: integer
+          minimum: 1
+
+    EvaluateRecommendationRequest:
+      type: object
+      required: [evaluation]
+      properties:
+        evaluation:
+          type: string
+          enum: [correct, incorrect, one_away]
+          description: User's evaluation of the recommendation
+        one_away_details:
+          type: object
+          nullable: true
+          description: Additional details for one-away evaluations
+          properties:
+            likely_correct_words:
+              type: array
+              items:
+                type: string
+              minItems: 3
+              maxItems: 3
+              description: The 3 words that likely belong together
+            likely_incorrect_word:
+              type: string
+              description: The 1 word that doesn't belong
+
+    EvaluationResponse:
+      type: object
+      required: [recommendation, session_status, next_action]
+      properties:
+        recommendation:
+          $ref: '#/components/schemas/RecommendationResponse'
+        session_status:
+          type: string
+          enum: [active, completed, failed]
+          description: Updated session status after evaluation
+        next_action:
+          type: string
+          enum: [request_next_recommendation, view_history, game_complete]
+          description: Suggested next action for user
+        solved_group:
+          $ref: '#/components/schemas/SolvedGroup'
+          nullable: true
+          description: Group details if evaluation was correct
+
+    RecommendationHistoryResponse:
+      type: object
+      required: [recommendations, session_summary]
+      properties:
+        recommendations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecommendationResponse'
+          description: All recommendations in chronological order
+        session_summary:
+          type: object
+          required: [total_recommendations, correct_evaluations, incorrect_evaluations, one_away_evaluations]
+          properties:
+            total_recommendations:
+              type: integer
+            correct_evaluations:
+              type: integer
+            incorrect_evaluations:
+              type: integer
+            one_away_evaluations:
+              type: integer
+            session_duration_minutes:
+              type: number
+              format: float
 
     ErrorResponse:
       type: object
@@ -510,24 +484,12 @@ components:
           nullable: true
           description: Additional error context
 
-  securitySchemes:
-    SessionAuth:
-      type: apiKey
-      in: header
-      name: X-Session-ID
-      description: Session identifier for request context
-
-security:
-  - SessionAuth: []
-
 tags:
   - name: Puzzles
-    description: Puzzle management operations
+    description: Puzzle upload and management operations
   - name: Sessions
     description: Game session management
-  - name: Guesses
-    description: Word group guess operations
   - name: AI Recommendations
-    description: LLM-powered word grouping suggestions
-  - name: WebSocket
-    description: Real-time communication endpoints
+    description: LLM-powered word grouping suggestions and evaluations
+  - name: History
+    description: Recommendation history and session tracking

@@ -2,7 +2,7 @@
 
 **Endpoint**: `/ws/sessions/{session_id}/recommendations`  
 **Protocol**: WebSocket  
-**Purpose**: Real-time streaming of AI recommendation generation
+**Purpose**: Real-time streaming of AI recommendation generation and evaluation updates
 
 ## Connection Lifecycle
 
@@ -24,25 +24,41 @@ All messages are JSON format with `type` field for message discrimination.
 
 ## Client → Server Messages
 
-### Request AI Recommendations
+### Request AI Recommendation
 ```json
 {
-  "type": "request_recommendations",
-  "request_id": "uuid-string",
-  "include_explanations": true,
-  "max_suggestions": 4
+  "type": "generate_recommendation",
+  "request_id": "uuid-string"
 }
 ```
 
 **Validation**:
 - `request_id` must be unique UUID
-- `include_explanations` defaults to true
-- `max_suggestions` must be 1-4, defaults to 4
+- Session must be active and not have pending recommendation
+- Must have remaining words to recommend
 
-### Cancel Request
+### Evaluate Current Recommendation
 ```json
 {
-  "type": "cancel_request", 
+  "type": "evaluate_recommendation",
+  "recommendation_id": "uuid-string", 
+  "evaluation": "correct",
+  "one_away_details": {
+    "likely_correct_words": ["WORD1", "WORD2", "WORD3"],
+    "likely_incorrect_word": "WORD4"
+  }
+}
+```
+
+**Validation**:
+- `evaluation` must be "correct", "incorrect", or "one_away"  
+- `one_away_details` required only if evaluation is "one_away"
+- `recommendation_id` must match current pending recommendation
+
+### Request Session History
+```json
+{
+  "type": "request_history",
   "request_id": "uuid-string"
 }
 ```
@@ -54,73 +70,100 @@ All messages are JSON format with `type` field for message discrimination.
 {
   "type": "connection_ack",
   "session_id": "uuid-string",
+  "session_status": "active",
   "remaining_words": ["WORD1", "WORD2", ...],
-  "can_request": true
+  "solved_groups_count": 1,
+  "incorrect_evaluation_count": 0,
+  "pending_recommendation_id": "uuid-string"
 }
 ```
 
-### Request Acknowledged
+### Recommendation Generation Status
 ```json
 {
-  "type": "request_ack",
-  "request_id": "uuid-string",
-  "estimated_completion_ms": 2000
-}
-```
-
-### Processing Status
-```json
-{
-  "type": "processing_status",
+  "type": "generation_status",
   "request_id": "uuid-string",
   "status": "analyzing_words",
-  "progress_percent": 25
+  "progress_percent": 25,
+  "estimated_completion_ms": 1500
 }
 ```
 
 **Status Values**:
-- `analyzing_words` - LLM analyzing word relationships
-- `generating_groups` - Creating potential groupings
-- `calculating_confidence` - Computing confidence scores
+- `analyzing_context` - Processing previous recommendations and evaluations
+- `analyzing_words` - LLM analyzing remaining word relationships
+- `generating_explanation` - Creating reasoning for grouping
 - `finalizing` - Preparing final response
 
-### Partial Recommendation
+### Recommendation Generated
 ```json
 {
-  "type": "partial_recommendation",
+  "type": "recommendation_generated",
   "request_id": "uuid-string",
   "recommendation": {
-    "words": ["WORD1", "WORD2", "WORD3", "WORD4"],
-    "explanation": "These are all types of...",
-    "confidence": 0.85
-  },
-  "sequence_number": 1
+    "id": "rec-uuid-123",
+    "recommended_words": ["WORD1", "WORD2", "WORD3", "WORD4"],
+    "explanation": "These are all types of fish commonly eaten as food",
+    "timestamp": "2025-09-09T20:00:00Z",
+    "llm_model": "gpt-4",
+    "processing_time_ms": 1850
+  }
 }
 ```
 
-### Complete Recommendations
+### Evaluation Processed
 ```json
 {
-  "type": "recommendations_complete",
+  "type": "evaluation_processed",
+  "recommendation": {
+    "id": "rec-uuid-123",
+    "recommended_words": ["WORD1", "WORD2", "WORD3", "WORD4"],
+    "explanation": "These are all types of fish",
+    "user_evaluation": "correct",
+    "evaluation_timestamp": "2025-09-09T20:01:00Z"
+  },
+  "session_update": {
+    "status": "active",
+    "remaining_words": ["WORD5", "WORD6", ...],
+    "solved_groups_count": 2,
+    "incorrect_evaluation_count": 0
+  },
+  "solved_group": {
+    "theme": "Types of Fish", 
+    "difficulty": "green",
+    "words": ["WORD1", "WORD2", "WORD3", "WORD4"]
+  },
+  "next_action": "request_next_recommendation"
+}
+```
+
+### Session History
+```json
+{
+  "type": "session_history",
   "request_id": "uuid-string",
   "recommendations": [
     {
-      "words": ["WORD1", "WORD2", "WORD3", "WORD4"],
-      "explanation": "These are all types of fish",
-      "confidence": 0.92
+      "id": "rec-uuid-001",
+      "recommended_words": ["BASS", "PIANO", "GUITAR", "DRUMS"],
+      "explanation": "These are all musical instruments",
+      "user_evaluation": "correct",
+      "evaluation_timestamp": "2025-09-09T20:00:00Z"
     },
     {
-      "words": ["WORD5", "WORD6", "WORD7", "WORD8"], 
-      "explanation": "These are all musical instruments",
-      "confidence": 0.78
+      "id": "rec-uuid-002", 
+      "recommended_words": ["SALMON", "APPLE", "COD", "TROUT"],
+      "explanation": "These are all organic items",
+      "user_evaluation": "one_away",
+      "evaluation_timestamp": "2025-09-09T20:01:00Z"
     }
   ],
-  "processing_time_ms": 1850,
-  "llm_model": "gpt-4",
-  "confidence_scores": {
-    "overall": 0.85,
-    "recommendation_0": 0.92,
-    "recommendation_1": 0.78
+  "session_summary": {
+    "total_recommendations": 2,
+    "correct_evaluations": 1,
+    "incorrect_evaluations": 0,
+    "one_away_evaluations": 1,
+    "session_duration_minutes": 3.5
   }
 }
 ```
