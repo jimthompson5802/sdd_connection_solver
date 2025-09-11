@@ -444,6 +444,16 @@ uvicorn backend.src.main:app --host 127.0.0.1 --port 8000 --reload
 
 ---
 
+### Sample Screenshots
+
+#### Starting the FastAPI Application
+![FastAPI Startup](./images/first_time_run_app_server.png)
+
+#### Browser test access of endpoints
+![FastAPI Endpoints](./images/first_time_access_app_server_endpoints.png)
+
+---
+
 ## Console Output
 
 ```shell
