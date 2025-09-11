@@ -110,7 +110,7 @@
 ## Phase 3.4: Integration
 
 ### Backend Integration
-- [ ] T047 FastAPI application setup with CORS and middleware in backend/src/main.py
+- [x] T047 FastAPI application setup with CORS and middleware in backend/src/main.py
 - [ ] T048 Error handling middleware and logging configuration in backend/src/middleware/error_handling.py
 - [ ] T049 File upload validation and size limits in backend/src/middleware/file_validation.py
 - [ ] T050 Session-based storage with in-memory implementation in backend/src/storage/session_storage.py
