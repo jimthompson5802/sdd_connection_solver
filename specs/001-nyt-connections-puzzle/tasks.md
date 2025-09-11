@@ -83,11 +83,11 @@
 - [x] T027 [P] OneAwayGroup model in backend/src/models/one_away_group.py
 
 ### Services Layer
-- [ ] T028 [P] Puzzle service for file upload and word validation in backend/src/services/puzzle_service.py
-- [ ] T029 [P] Session service for game state management in backend/src/services/session_service.py
-- [ ] T030 LLM recommendation service with context-aware prompting in backend/src/services/llm_service.py
-- [ ] T031 Evaluation service for processing user feedback in backend/src/services/evaluation_service.py
-- [ ] T032 [P] Context service for managing AI recommendation context in backend/src/services/context_service.py
+- [x] T028 [P] Puzzle service for file upload and word validation in backend/src/services/puzzle_service.py
+- [x] T029 [P] Session service for game state management in backend/src/services/session_service.py
+- [x] T030 LLM recommendation service with context-aware prompting in backend/src/services/llm_service.py
+- [x] T031 Evaluation service for processing user feedback in backend/src/services/evaluation_service.py
+- [x] T032 [P] Context service for managing AI recommendation context in backend/src/services/context_service.py
 
 ### API Endpoints
 - [ ] T033 [P] POST /api/v1/puzzles/upload endpoint with file handling in backend/src/api/puzzles.py
