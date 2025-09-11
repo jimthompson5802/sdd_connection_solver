@@ -1,12 +1,13 @@
 """Session model for tracking user's puzzle-solving session."""
 
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field, validator
 
 from .recommendation import Recommendation
+from .group import Group
 
 
 class Session(BaseModel):
@@ -22,7 +23,9 @@ class Session(BaseModel):
         remaining_words: Words still available for recommendations
         incorrect_evaluation_count: Number of incorrect evaluations made (max 4)
         recommendation_history: All recommendations made in this session
+        solved_groups: List of solved groups with themes and difficulties
         llm_model_config: Configured LLM model for this session
+        pending_recommendation_id: ID of current unevaluated recommendation
 
     Returns:
         Session instance with validation applied
@@ -37,7 +40,9 @@ class Session(BaseModel):
     remaining_words: List[str] = Field(..., min_items=4, max_items=16)
     incorrect_evaluation_count: int = Field(default=0, ge=0, le=4)
     recommendation_history: List[Recommendation] = Field(default_factory=list)
+    solved_groups: List[Group] = Field(default_factory=list)
     llm_model_config: str = Field(..., min_length=1)
+    pending_recommendation_id: Optional[str] = None
 
     @validator("status")
     def validate_status(cls, v: str) -> str:
@@ -169,6 +174,34 @@ class Session(BaseModel):
         if start_time and v < start_time:
             raise ValueError("Last activity cannot be before start time")
         return v
+
+    def can_request_recommendation(self) -> bool:
+        """Check if session can accept new recommendations.
+
+        Returns:
+            True if session can accept new recommendations, False otherwise
+        """
+        # Can't request if session is not active
+        if self.status != "active":
+            return False
+
+        # Can't request if there's a pending recommendation
+        if self.pending_recommendation_id is not None:
+            return False
+
+        # Can't request if too many incorrect evaluations
+        if self.incorrect_evaluation_count >= 4:
+            return False
+
+        # Can't request if puzzle is already solved
+        if self.solved_groups_count >= 4:
+            return False
+
+        # Can't request if not enough remaining words
+        if len(self.remaining_words) < 4:
+            return False
+
+        return True
 
     class Config:
         """Pydantic configuration."""

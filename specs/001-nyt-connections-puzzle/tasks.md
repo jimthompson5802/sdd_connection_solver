@@ -90,14 +90,14 @@
 - [x] T032 [P] Context service for managing AI recommendation context in backend/src/services/context_service.py
 
 ### API Endpoints
-- [ ] T033 [P] POST /api/v1/puzzles/upload endpoint with file handling in backend/src/api/puzzles.py
-- [ ] T034 [P] GET /api/v1/puzzles/{puzzle_id} endpoint in backend/src/api/puzzles.py
-- [ ] T035 [P] POST /api/v1/sessions endpoint with LLM model config in backend/src/api/sessions.py
-- [ ] T036 [P] GET /api/v1/sessions/{session_id} endpoint in backend/src/api/sessions.py
-- [ ] T037 POST /api/v1/sessions/{session_id}/recommendations endpoint with LLM integration in backend/src/api/recommendations.py
-- [ ] T038 GET /api/v1/sessions/{session_id}/recommendations endpoint in backend/src/api/recommendations.py
-- [ ] T039 POST /api/v1/sessions/{session_id}/recommendations/{recommendation_id}/evaluate endpoint in backend/src/api/recommendations.py
-- [ ] T040 [P] GET /api/v1/sessions/{session_id}/history endpoint in backend/src/api/history.py
+- [x] T033 [P] POST /api/v1/puzzles/upload endpoint with file handling in backend/src/api/puzzles.py
+- [x] T034 [P] GET /api/v1/puzzles/{puzzle_id} endpoint in backend/src/api/puzzles.py
+- [x] T035 [P] POST /api/v1/sessions endpoint with LLM model config in backend/src/api/sessions.py
+- [x] T036 [P] GET /api/v1/sessions/{session_id} endpoint in backend/src/api/sessions.py
+- [x] T037 POST /api/v1/sessions/{session_id}/recommendations endpoint with LLM integration in backend/src/api/recommendations.py
+- [x] T038 GET /api/v1/sessions/{session_id}/recommendations endpoint in backend/src/api/recommendations.py
+- [x] T039 POST /api/v1/sessions/{session_id}/recommendations/{recommendation_id}/evaluate endpoint in backend/src/api/recommendations.py
+- [x] T040 [P] GET /api/v1/sessions/{session_id}/history endpoint in backend/src/api/history.py
 
 ### Frontend Components
 - [ ] T041 [P] File upload component with drag-and-drop support in frontend/src/components/FileUpload.ts
