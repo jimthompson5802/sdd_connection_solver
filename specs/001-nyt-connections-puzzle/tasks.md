@@ -74,13 +74,13 @@
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
 
 ### Data Models
-- [ ] T021 [P] Puzzle model in backend/src/models/puzzle.py
-- [ ] T022 [P] Word model in backend/src/models/word.py
-- [ ] T023 [P] Group model in backend/src/models/group.py
-- [ ] T024 [P] Recommendation model in backend/src/models/recommendation.py
-- [ ] T025 [P] Session model in backend/src/models/session.py
-- [ ] T026 [P] AIRecommendationContext model in backend/src/models/ai_context.py
-- [ ] T027 [P] OneAwayGroup model in backend/src/models/one_away_group.py
+- [x] T021 [P] Puzzle model in backend/src/models/puzzle.py
+- [x] T022 [P] Word model in backend/src/models/word.py
+- [x] T023 [P] Group model in backend/src/models/group.py
+- [x] T024 [P] Recommendation model in backend/src/models/recommendation.py
+- [x] T025 [P] Session model in backend/src/models/session.py
+- [x] T026 [P] AIRecommendationContext model in backend/src/models/ai_context.py
+- [x] T027 [P] OneAwayGroup model in backend/src/models/one_away_group.py
 
 ### Services Layer
 - [ ] T028 [P] Puzzle service for file upload and word validation in backend/src/services/puzzle_service.py
