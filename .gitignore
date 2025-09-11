@@ -93,3 +93,4 @@ coverage.xml
 
 # Custom
 # Add any project-specific ignores below
+.VSCodeCounter/
