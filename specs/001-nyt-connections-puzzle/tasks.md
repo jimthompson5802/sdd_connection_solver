@@ -1,4 +1,8 @@
-# Tasks: NYT Connections Puzzle Assistant Web Application
+# Tasks: NYT Connections Puzzle Assistant Web Ap### Contract Tests (API Endpoints)
+- [x] T006 [P] Contract test POST /api/v1/puzzles/upload in backend/tests/contract/test_puzzles_upload.py
+- [x] T007 [P] Contract test GET /api/v1/puzzles/{puzzle_id} in backend/tests/contract/test_puzzles_get.py
+- [x] T008 [P] Contract test POST /api/v1/sessions in backend/tests/contract/test_sessions_create.py
+- [ ] T009 [P] Contract test GET /api/v1/sessions/{session_id} in backend/tests/contract/test_sessions_get.pytion
 
 **Input**: Design documents from `/specs/001-nyt-connections-puzzle/`  
 **Prerequisites**: plan.md (required), research.md, data-model.md, contracts/
@@ -47,9 +51,9 @@
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
 
 ### Contract Tests (API Endpoints)
-- [ ] T006 [P] Contract test POST /api/v1/puzzles/upload in backend/tests/contract/test_puzzles_upload.py
-- [ ] T007 [P] Contract test GET /api/v1/puzzles/{puzzle_id} in backend/tests/contract/test_puzzles_get.py
-- [ ] T008 [P] Contract test POST /api/v1/sessions in backend/tests/contract/test_sessions_create.py
+- [x] T006 [P] Contract test POST /api/v1/puzzles/upload in backend/tests/contract/test_puzzles_upload.py
+- [x] T007 [P] Contract test GET /api/v1/puzzles/{puzzle_id} in backend/tests/contract/test_puzzles_get.py
+- [x] T008 [P] Contract test POST /api/v1/sessions in backend/tests/contract/test_sessions_create.py
 - [ ] T009 [P] Contract test GET /api/v1/sessions/{session_id} in backend/tests/contract/test_sessions_get.py
 - [ ] T010 [P] Contract test POST /api/v1/sessions/{session_id}/recommendations in backend/tests/contract/test_recommendations_create.py
 - [ ] T011 [P] Contract test GET /api/v1/sessions/{session_id}/recommendations in backend/tests/contract/test_recommendations_get.py
