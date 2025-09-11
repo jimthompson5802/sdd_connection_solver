@@ -54,22 +54,22 @@
 - [x] T006 [P] Contract test POST /api/v1/puzzles/upload in backend/tests/contract/test_puzzles_upload.py
 - [x] T007 [P] Contract test GET /api/v1/puzzles/{puzzle_id} in backend/tests/contract/test_puzzles_get.py
 - [x] T008 [P] Contract test POST /api/v1/sessions in backend/tests/contract/test_sessions_create.py
-- [ ] T009 [P] Contract test GET /api/v1/sessions/{session_id} in backend/tests/contract/test_sessions_get.py
-- [ ] T010 [P] Contract test POST /api/v1/sessions/{session_id}/recommendations in backend/tests/contract/test_recommendations_create.py
-- [ ] T011 [P] Contract test GET /api/v1/sessions/{session_id}/recommendations in backend/tests/contract/test_recommendations_get.py
-- [ ] T012 [P] Contract test POST /api/v1/sessions/{session_id}/recommendations/{recommendation_id}/evaluate in backend/tests/contract/test_recommendations_evaluate.py
-- [ ] T013 [P] Contract test GET /api/v1/sessions/{session_id}/history in backend/tests/contract/test_history.py
+- [x] T009 [P] Contract test GET /api/v1/sessions/{session_id} in backend/tests/contract/test_sessions_get.py
+- [x] T010 [P] Contract test POST /api/v1/sessions/{session_id}/recommendations in backend/tests/contract/test_recommendations_create.py
+- [x] T011 [P] Contract test GET /api/v1/sessions/{session_id}/recommendations in backend/tests/contract/test_recommendations_get.py
+- [x] T012 [P] Contract test POST /api/v1/sessions/{session_id}/recommendations/{recommendation_id}/evaluate in backend/tests/contract/test_recommendations_evaluate.py
+- [x] T013 [P] Contract test GET /api/v1/sessions/{session_id}/history in backend/tests/contract/test_history.py
 
 ### Integration Tests (User Stories)
-- [ ] T014 [P] Integration test complete puzzle upload workflow in backend/tests/integration/test_puzzle_upload_flow.py
-- [ ] T015 [P] Integration test session creation with LLM model selection in backend/tests/integration/test_session_creation.py
-- [ ] T016 [P] Integration test AI recommendation generation with context in backend/tests/integration/test_ai_recommendations.py
-- [ ] T017 [P] Integration test evaluation workflow (correct/incorrect/one-away) in backend/tests/integration/test_evaluation_flow.py
-- [ ] T018 [P] Integration test complete game session from upload to completion in backend/tests/integration/test_complete_game.py
+- [x] T014 [P] Integration test complete puzzle upload workflow in backend/tests/integration/test_puzzle_upload_flow.py
+- [x] T015 [P] Integration test session creation with LLM model selection in backend/tests/integration/test_session_creation.py
+- [x] T016 [P] Integration test AI recommendation generation with context in backend/tests/integration/test_ai_recommendations.py
+- [x] T017 [P] Integration test evaluation workflow (correct/incorrect/one-away) in backend/tests/integration/test_evaluation_flow.py
+- [x] T018 [P] Integration test complete game session from upload to completion in backend/tests/integration/test_complete_game.py
 
 ### Frontend Integration Tests
-- [ ] T019 [P] E2E test file upload and puzzle creation in frontend/tests/e2e/test_file_upload.spec.ts
-- [ ] T020 [P] E2E test recommendation evaluation workflow in frontend/tests/e2e/test_evaluation.spec.ts
+- [x] T019 [P] E2E test file upload and puzzle creation in frontend/tests/e2e/test_file_upload.spec.ts
+- [x] T020 [P] E2E test recommendation evaluation workflow in frontend/tests/e2e/test_evaluation.spec.ts
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
 
