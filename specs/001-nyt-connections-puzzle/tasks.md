@@ -120,14 +120,14 @@
 - [x] T052 [P] Frontend WebSocket client for real-time updates in frontend/src/services/WebSocketService.ts
 
 ### LLM Integration
-- [ ] T053 LangChain integration with configurable models (OpenAI, Claude) in backend/src/llm/model_factory.py
-- [ ] T054 Dynamic prompt template system with context injection in backend/src/llm/prompt_templates.py
-- [ ] T055 Context-aware recommendation generation with one-away learning in backend/src/llm/recommendation_engine.py
+- [x] T053 LangChain integration with configurable models (OpenAI, Claude) in backend/src/llm/model_factory.py
+- [x] T054 Dynamic prompt template system with context injection in backend/src/llm/prompt_templates.py
+- [x] T055 Context-aware recommendation generation with one-away learning in backend/src/llm/recommendation_engine.py
 
 ### Frontend Integration
-- [ ] T056 Main application component connecting all features in frontend/src/App.ts
-- [ ] T057 API service layer for HTTP requests in frontend/src/services/ApiService.ts
-- [ ] T058 State management for game session in frontend/src/services/GameState.ts
+- [x] T056 Main application component connecting all features in frontend/src/App.ts
+- [x] T057 API service layer for HTTP requests in frontend/src/services/ApiService.ts
+- [x] T058 State management for game session in frontend/src/services/GameState.ts
 
 ## Phase 3.5: Polish
 
