@@ -32,5 +32,6 @@ export default defineConfig({
   webServer: {
     command: 'npm run serve',
     port: 8080,
+    reuseExistingServer: true
   },
 });
