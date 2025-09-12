@@ -365,12 +365,12 @@ export class App {
     this.log('Initializing UI components...');
     
     // For now, create placeholder component references
-    this.components.set('fileUpload', new FileUpload());
-    this.components.set('puzzleView', new PuzzleView());
-    this.components.set('recommendationCard', new RecommendationCard());
-    this.components.set('evaluationButtons', new EvaluationButtons());
-    this.components.set('sessionStatus', new SessionStatus());
-    this.components.set('historyView', new HistoryView());
+    this.components.set('fileUpload', new FileUpload('file-upload'));
+    this.components.set('puzzleView', new PuzzleView('puzzle-view'));
+    this.components.set('recommendationCard', new RecommendationCard('recommendation-card'));
+    this.components.set('evaluationButtons', new EvaluationButtons('evaluation-buttons'));
+    this.components.set('sessionStatus', new SessionStatus('session-status'));
+    this.components.set('historyView', new HistoryView('history-view'));
   }
 
   /**
