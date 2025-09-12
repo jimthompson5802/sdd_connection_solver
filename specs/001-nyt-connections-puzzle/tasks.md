@@ -138,9 +138,9 @@
 - [x] T062 [P] Unit tests for context management in backend/tests/unit/test_context_service.py
 
 ### Performance and Validation
-- [ ] T063 Performance tests for AI recommendation generation (<2 seconds) in backend/tests/performance/test_recommendation_timing.py
-- [ ] T064 WebSocket connection capacity testing (100+ concurrent users) in backend/tests/performance/test_websocket_capacity.py
-- [ ] T065 API response time validation (<100ms for non-AI operations) in backend/tests/performance/test_api_response_times.py
+- [x] T063 Performance tests for AI recommendation generation (<2 seconds) in backend/tests/performance/test_recommendation_timing.py
+- [x] T064 WebSocket connection capacity testing (100+ concurrent users) in backend/tests/performance/test_websocket_capacity.py
+- [x] T065 API response time validation (<100ms for non-AI operations) in backend/tests/performance/test_api_response_times.py
 
 ### Documentation and Final Setup
 - [ ] T066 [P] Create health check endpoints (/health, /health/db, /health/llm) in backend/src/api/health.py
