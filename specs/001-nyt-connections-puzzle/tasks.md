@@ -143,8 +143,8 @@
 - [x] T065 API response time validation (<100ms for non-AI operations) in backend/tests/performance/test_api_response_times.py
 
 ### Documentation and Final Setup
-- [ ] T066 [P] Create health check endpoints (/health, /health/db, /health/llm) in backend/src/api/health.py
-- [ ] T067 [P] Frontend production build configuration in frontend/webpack.config.js
+- [x] T066 [P] Create health check endpoints (/health, /health/db, /health/llm) in backend/src/api/health.py
+- [x] T067 [P] Frontend production build configuration in frontend/webpack.config.js
 - [ ] T068 [P] Update documentation with API examples in docs/api-examples.md
 - [ ] T069 Execute quickstart guide validation scenarios from specs/001-nyt-connections-puzzle/quickstart.md
 

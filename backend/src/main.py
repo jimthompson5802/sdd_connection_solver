@@ -24,6 +24,7 @@ from .api.puzzles import router as puzzles_router
 from .api.sessions import router as sessions_router
 from .api.recommendations import router as recommendations_router
 from .api.history import router as history_router
+from .api.health import router as health_router
 
 # Import WebSocket handlers
 from .websockets.recommendation_handler import RecommendationWebSocketHandler
@@ -186,6 +187,7 @@ async def log_requests(request: Request, call_next):
 
 
 # Include API routers
+app.include_router(health_router)
 app.include_router(puzzles_router)
 app.include_router(sessions_router)
 app.include_router(recommendations_router)
