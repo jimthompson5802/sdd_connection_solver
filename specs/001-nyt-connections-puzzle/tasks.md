@@ -116,8 +116,8 @@
 - [x] T050 Session-based storage with in-memory implementation in backend/src/storage/session_storage.py
 
 ### WebSocket Integration
-- [ ] T051 WebSocket connection handler for real-time recommendations in backend/src/websockets/recommendation_handler.py
-- [ ] T052 [P] Frontend WebSocket client for real-time updates in frontend/src/services/WebSocketService.ts
+- [x] T051 WebSocket connection handler for real-time recommendations in backend/src/websockets/recommendation_handler.py
+- [x] T052 [P] Frontend WebSocket client for real-time updates in frontend/src/services/WebSocketService.ts
 
 ### LLM Integration
 - [ ] T053 LangChain integration with configurable models (OpenAI, Claude) in backend/src/llm/model_factory.py

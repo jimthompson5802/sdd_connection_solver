@@ -13,7 +13,7 @@ import logging
 from contextlib import asynccontextmanager
 from typing import Dict, Any
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
@@ -24,6 +24,12 @@ from .api.puzzles import router as puzzles_router
 from .api.sessions import router as sessions_router
 from .api.recommendations import router as recommendations_router
 from .api.history import router as history_router
+
+# Import WebSocket handlers
+from .websockets.recommendation_handler import RecommendationWebSocketHandler
+from .services.session_service import SessionService
+from .services.llm_service import LLMService
+from .services.context_service import ContextService
 
 
 # Configure logging
@@ -184,6 +190,26 @@ app.include_router(puzzles_router)
 app.include_router(sessions_router)
 app.include_router(recommendations_router)
 app.include_router(history_router)
+
+
+# Initialize services for WebSocket
+session_service = SessionService()
+llm_service = LLMService()
+context_service = ContextService()
+websocket_handler = RecommendationWebSocketHandler(session_service, llm_service, context_service)
+
+
+# WebSocket endpoint for real-time recommendations
+@app.websocket("/ws/sessions/{session_id}/recommendations")
+async def websocket_endpoint(websocket: WebSocket, session_id: str):
+    """
+    WebSocket endpoint for real-time AI recommendations.
+
+    Args:
+        websocket: WebSocket connection
+        session_id: Session identifier for the connection
+    """
+    await websocket_handler.handle_connection(websocket, session_id)
 
 
 # Root endpoint
