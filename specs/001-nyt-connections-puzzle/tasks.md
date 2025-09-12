@@ -100,12 +100,12 @@
 - [x] T040 [P] GET /api/v1/sessions/{session_id}/history endpoint in backend/src/api/history.py
 
 ### Frontend Components
-- [ ] T041 [P] File upload component with drag-and-drop support in frontend/src/components/FileUpload.ts
-- [ ] T042 [P] Puzzle display component showing remaining words in frontend/src/components/PuzzleView.ts
-- [ ] T043 [P] Recommendation display component with explanation in frontend/src/components/RecommendationCard.ts
-- [ ] T044 [P] Evaluation buttons component (Correct/Incorrect/One-Away) in frontend/src/components/EvaluationButtons.ts
-- [ ] T045 [P] Session status component showing progress in frontend/src/components/SessionStatus.ts
-- [ ] T046 [P] History view component for past recommendations in frontend/src/components/HistoryView.ts
+- [x] T041 [P] File upload component with drag-and-drop support in frontend/src/components/FileUpload.ts
+- [x] T042 [P] Puzzle display component showing remaining words in frontend/src/components/PuzzleView.ts
+- [x] T043 [P] Recommendation display component with explanation in frontend/src/components/RecommendationCard.ts
+- [x] T044 [P] Evaluation buttons component (Correct/Incorrect/One-Away) in frontend/src/components/EvaluationButtons.ts
+- [x] T045 [P] Session status component showing progress in frontend/src/components/SessionStatus.ts
+- [x] T046 [P] History view component for past recommendations in frontend/src/components/HistoryView.ts
 
 ## Phase 3.4: Integration
 
