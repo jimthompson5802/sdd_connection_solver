@@ -221,7 +221,7 @@ class TestPromptTemplateManager:
 
     def test_select_template_one_away_focused(self):
         """Test template selection for one-away focused recommendation."""
-        one_away_group = OneAwayGroup(attempted_words=["apple", "banana", "cherry", "grape"], feedback="One away!")
+        one_away_group = OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away!")
         ai_context = AIRecommendationContext(
             remaining_words=["apple", "banana", "cherry", "date"],
             solved_groups=[],
@@ -276,7 +276,7 @@ class TestPromptTemplateManager:
     def test_build_context_variables_full(self):
         """Test building context variables with full AI context."""
         solved_group = Group(words=["red", "blue", "green", "yellow"], theme="Colors", difficulty="easy")
-        one_away_group = OneAwayGroup(attempted_words=["apple", "banana", "cherry", "grape"], feedback="One away!")
+        one_away_group = OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away!")
 
         ai_context = AIRecommendationContext(
             remaining_words=["apple", "banana", "cherry", "date"],
@@ -343,8 +343,8 @@ class TestPromptTemplateManager:
     def test_format_one_away_attempts_multiple(self):
         """Test formatting multiple one-away attempts."""
         attempts = [
-            OneAwayGroup(attempted_words=["apple", "banana", "cherry", "grape"], feedback="One away!"),
-            OneAwayGroup(attempted_words=["cat", "dog", "bird", "snake"], feedback="One away!"),
+            OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away!"),
+            OneAwayGroup(words=["cat", "dog", "bird", "snake"], explanation="One away!"),
         ]
 
         result = self.manager._format_one_away_attempts(attempts)
@@ -452,9 +452,7 @@ class TestPromptGeneration:
             remaining_words=["apple", "banana", "cherry", "date"],
             solved_groups=[],
             incorrect_groups=[["word1", "word2", "word3", "word4"]],
-            one_away_groups=[
-                OneAwayGroup(attempted_words=["apple", "banana", "cherry", "grape"], feedback="One away!")
-            ],
+            one_away_groups=[OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away!")],
         )
 
         # Test that all default templates can be rendered without errors

@@ -37,7 +37,7 @@ class Session(BaseModel):
     last_activity: datetime = Field(default_factory=datetime.now)
     status: str = Field(default="active", pattern="^(active|completed|failed|abandoned)$")
     solved_groups_count: int = Field(default=0, ge=0, le=4)
-    remaining_words: List[str] = Field(..., min_items=4, max_items=16)
+    remaining_words: List[str] = Field(..., max_items=16)
     incorrect_evaluation_count: int = Field(default=0, ge=0, le=4)
     recommendation_history: List[Recommendation] = Field(default_factory=list)
     solved_groups: List[Group] = Field(default_factory=list)
@@ -93,8 +93,22 @@ class Session(BaseModel):
         Raises:
             ValueError: If validation fails
         """
+        # Validate count consistency with solved groups first
+        solved_groups_count = values.get("solved_groups_count", 0)
+        expected_remaining = 16 - (solved_groups_count * 4)
+
+        # If puzzle is completed (expected_remaining = 0), allow empty list
+        if expected_remaining == 0:
+            if v:
+                raise ValueError(
+                    f"Remaining words should be empty when puzzle is completed "
+                    f"(solved_groups_count={solved_groups_count})"
+                )
+            return v  # Return empty list for completed puzzles
+
+        # For incomplete puzzles, remaining words cannot be empty
         if not v:
-            raise ValueError("Remaining words cannot be empty")
+            raise ValueError("Remaining words cannot be empty for incomplete puzzles")
 
         # Check for empty words
         if any(not word.strip() for word in v):
@@ -105,9 +119,7 @@ class Session(BaseModel):
         if len(set(lower_words)) != len(lower_words):
             raise ValueError("All remaining words must be unique")
 
-        # Validate count consistency with solved groups
-        solved_groups_count = values.get("solved_groups_count", 0)
-        expected_remaining = 16 - (solved_groups_count * 4)
+        # Validate count consistency
         if len(v) != expected_remaining:
             raise ValueError(
                 f"Remaining words count ({len(v)}) doesn't match expected "

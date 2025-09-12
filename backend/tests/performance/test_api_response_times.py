@@ -75,7 +75,7 @@ class TestAPIResponseTimes:
         """Mock session service for testing."""
         with patch("src.api.sessions.session_service") as mock:
             mock_session = Session(
-                id="test-session-123", puzzle_id="test-puzzle-123", llm_model="gpt-4", user_id="test-user"
+                id="test-session-123", puzzle_id="test-puzzle-123", llm_model_config="gpt-4", user_id="test-user"
             )
             mock.create_session.return_value = mock_session
             mock.get_session.return_value = mock_session
@@ -140,7 +140,7 @@ class TestAPIResponseTimes:
 
         with patch("src.api.history.session_service") as mock_history_service:
             mock_history_service.get_session.return_value = Session(
-                id=session_id, puzzle_id="test-puzzle-123", llm_model="gpt-4"
+                id=session_id, puzzle_id="test-puzzle-123", llm_model_config="gpt-4"
             )
             mock_history_service.get_session_history.return_value = []
 
@@ -158,7 +158,7 @@ class TestAPIResponseTimes:
 
         with patch("src.api.recommendations.session_service") as mock_rec_service:
             mock_rec_service.get_session.return_value = Session(
-                id=session_id, puzzle_id="test-puzzle-123", llm_model="gpt-4"
+                id=session_id, puzzle_id="test-puzzle-123", llm_model_config="gpt-4"
             )
             mock_rec_service.get_session_recommendations.return_value = []
 

@@ -142,8 +142,8 @@ class LLMService:
         if context.one_away_groups:
             oneaway_info = []
             for group in context.one_away_groups:
-                hint = f" (hint: {group.correct_connection})" if group.correct_connection else ""
-                oneaway_info.append(f"~ {', '.join(group.attempted_words)} - one word wrong{hint}")
+                hint = f" (hint: {group.explanation})" if group.explanation else ""
+                oneaway_info.append(f"~ {', '.join(group.words)} - one word wrong{hint}")
             info_parts.append("ONE-AWAY GROUPS (3 words correct, 1 wrong):\n" + "\n".join(oneaway_info))
 
         return "\n\n".join(info_parts) if info_parts else "No previous context available."

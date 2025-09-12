@@ -25,15 +25,49 @@ class TestContextService:
         session = Session(
             id="session_1",
             puzzle_id="puzzle_1",
-            remaining_words=["apple", "banana", "cherry", "date"],
+            remaining_words=[
+                "apple",
+                "banana",
+                "cherry",
+                "date",
+                "elephant",
+                "fox",
+                "grape",
+                "hat",
+                "ice",
+                "juice",
+                "kite",
+                "lemon",
+                "mouse",
+                "nest",
+                "orange",
+                "pen",
+            ],
             solved_groups=[],
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
         )
 
         context = self.service.create_context_for_session(session)
 
         assert context.session_id == "session_1"
-        assert context.remaining_words == ["apple", "banana", "cherry", "date"]
+        assert context.remaining_words == [
+            "apple",
+            "banana",
+            "cherry",
+            "date",
+            "elephant",
+            "fox",
+            "grape",
+            "hat",
+            "ice",
+            "juice",
+            "kite",
+            "lemon",
+            "mouse",
+            "nest",
+            "orange",
+            "pen",
+        ]
         assert context.solved_groups == []
         assert context.incorrect_groups == []
         assert context.one_away_groups == []
@@ -47,9 +81,26 @@ class TestContextService:
         session = Session(
             id="session_1",
             puzzle_id="puzzle_1",
-            remaining_words=["apple", "banana", "cherry", "date"],
+            remaining_words=[
+                "apple",
+                "banana",
+                "cherry",
+                "date",
+                "elephant",
+                "fox",
+                "grape",
+                "hat",
+                "ice",
+                "juice",
+                "kite",
+                "lemon",
+                "mouse",
+                "nest",
+                "orange",
+                "pen",
+            ],
             solved_groups=[],
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
         )
 
         custom_words = ["cat", "dog", "bird", "fish"]
@@ -65,9 +116,26 @@ class TestContextService:
         session = Session(
             id="session_1",
             puzzle_id="puzzle_1",
-            remaining_words=["apple", "banana", "cherry", "date"],
+            remaining_words=[
+                "apple",
+                "banana",
+                "cherry",
+                "date",
+                "elephant",
+                "fox",
+                "grape",
+                "hat",
+                "ice",
+                "juice",
+                "kite",
+                "lemon",
+                "mouse",
+                "nest",
+                "orange",
+                "pen",
+            ],
             solved_groups=[],
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
         )
 
         original_context = self.service.create_context_for_session(session)
@@ -87,8 +155,8 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date", "cat", "dog", "bird", "fish"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=2,  # 16 - 2*4 = 8 remaining words
+            llm_model_config="gpt-4",
         )
 
         context = self.service.create_context_for_session(session)
@@ -123,8 +191,8 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=3,  # 16 - 3*4 = 4 remaining words
+            llm_model_config="gpt-4",
         )
 
         context = self.service.create_context_for_session(session)
@@ -148,8 +216,8 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=3,  # 16 - 3*4 = 4 remaining words
+            llm_model_config="gpt-4",
         )
 
         context = self.service.create_context_for_session(session)
@@ -177,8 +245,8 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=3,  # 16 - 3*4 = 4 remaining words
+            llm_model_config="gpt-4",
         )
 
         context = self.service.create_context_for_session(session)
@@ -195,9 +263,8 @@ class TestContextService:
 
         assert updated_context is not None
         assert len(updated_context.one_away_groups) == 1
-        assert updated_context.one_away_groups[0].attempted_words == ["apple", "banana", "cherry", "grape"]
-        assert updated_context.one_away_groups[0].correct_connection == "Types of fruit"
-        assert updated_context.one_away_groups[0].incorrect_word_hint == "grape should be date"
+        assert updated_context.one_away_groups[0].words == ["apple", "banana", "cherry", "grape"]
+        assert updated_context.one_away_groups[0].explanation == "Types of fruit"
         assert updated_context.created_at == datetime(2023, 1, 1, 12, 0, 0)
 
     def test_update_context_with_one_away_group_minimal(self):
@@ -206,8 +273,8 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=3,  # 16 - 3*4 = 4 remaining words
+            llm_model_config="gpt-4",
         )
 
         context = self.service.create_context_for_session(session)
@@ -218,9 +285,8 @@ class TestContextService:
 
         assert updated_context is not None
         assert len(updated_context.one_away_groups) == 1
-        assert updated_context.one_away_groups[0].attempted_words == ["apple", "banana", "cherry", "grape"]
-        assert updated_context.one_away_groups[0].correct_connection is None
-        assert updated_context.one_away_groups[0].incorrect_word_hint is None
+        assert updated_context.one_away_groups[0].words == ["apple", "banana", "cherry", "grape"]
+        assert "One away group:" in updated_context.one_away_groups[0].explanation
 
     def test_update_context_with_one_away_group_duplicate(self):
         """Test updating context with duplicate one-away group."""
@@ -228,8 +294,8 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=3,  # 16 - 3*4 = 4 remaining words
+            llm_model_config="gpt-4",
         )
 
         context = self.service.create_context_for_session(session)
@@ -257,8 +323,8 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date", "cat", "dog", "bird", "fish"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=2,  # 16 - 2*4 = 8 remaining words
+            llm_model_config="gpt-4",
         )
 
         self.service.create_context_for_session(session)
@@ -269,7 +335,7 @@ class TestContextService:
         )
         self.service.update_context_with_incorrect_group("session_1", ["cat", "dog", "bird", "snake"])
         self.service.update_context_with_one_away_group(
-            "session_1", ["cat", "dog", "bird", "fish"], "Animals", "fish should be mammal"
+            "session_1", ["cat", "dog", "bird", "fish"], "Animals are living creatures", "fish should be mammal"
         )
 
         summary = self.service.generate_context_summary("session_1")
@@ -286,7 +352,7 @@ class TestContextService:
         assert summary["incorrect_groups"] == [["cat", "dog", "bird", "snake"]]
         assert summary["one_away_attempts_count"] == 1
         assert len(summary["one_away_groups"]) == 1
-        assert summary["one_away_groups"][0]["attempted_words"] == ["cat", "dog", "bird", "fish"]
+        assert summary["one_away_groups"][0]["words"] == ["cat", "dog", "bird", "fish"]
         assert "last_updated" in summary
         assert "prompt_template_length" in summary
 
@@ -302,8 +368,8 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=3,  # 16 - 3*4 = 4 remaining words
+            llm_model_config="gpt-4",
         )
 
         context = self.service.create_context_for_session(session)
@@ -345,12 +411,47 @@ class TestContextService:
         """Test getting context statistics with multiple contexts."""
         # Create multiple sessions with different states
         for i in range(3):
+            if i < 2:
+                # First 2 sessions: not completed
+                remaining_words = [
+                    "word1",
+                    "word2",
+                    "word3",
+                    "word4",
+                    "word5",
+                    "word6",
+                    "word7",
+                    "word8",
+                    "word9",
+                    "word10",
+                    "word11",
+                    "word12",
+                    "word13",
+                    "word14",
+                    "word15",
+                    "word16",
+                ]
+                solved_groups = []
+                solved_groups_count = 0
+            else:
+                # Last session: completed with 4 groups
+                remaining_words = []
+                solved_groups = [
+                    {
+                        "words": ["group1_w1", "group1_w2", "group1_w3", "group1_w4"],
+                        "theme": "Group 1",
+                        "difficulty": "yellow",
+                    }
+                ]
+                solved_groups_count = 4
+
             session = Session(
                 id=f"session_{i}",
                 puzzle_id=f"puzzle_{i}",
-                remaining_words=["apple", "banana", "cherry", "date"] if i < 2 else [],  # One completed
-                solved_groups=[],
-                llm_model="gpt-4",
+                remaining_words=remaining_words,
+                solved_groups=solved_groups,
+                solved_groups_count=solved_groups_count,
+                llm_model_config="gpt-4",
             )
 
             self.service.create_context_for_session(session)
@@ -383,8 +484,8 @@ class TestContextService:
             id="active_session",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=3,  # 16 - 3*4 = 4 remaining words
+            llm_model_config="gpt-4",
         )
         self.service.create_context_for_session(active_session)
 
@@ -393,8 +494,8 @@ class TestContextService:
             id="completed_session",
             puzzle_id="puzzle_2",
             remaining_words=[],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=4,  # 16 - 4*4 = 0 remaining words
+            llm_model_config="gpt-4",
         )
         self.service.create_context_for_session(completed_session)
 
@@ -402,9 +503,26 @@ class TestContextService:
         old_session = Session(
             id="old_session",
             puzzle_id="puzzle_3",
-            remaining_words=["cat", "dog", "bird", "fish"],
+            remaining_words=[
+                "cat",
+                "dog",
+                "bird",
+                "fish",
+                "word5",
+                "word6",
+                "word7",
+                "word8",
+                "word9",
+                "word10",
+                "word11",
+                "word12",
+                "word13",
+                "word14",
+                "word15",
+                "word16",
+            ],
             solved_groups=[],
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
         )
         old_context = self.service.create_context_for_session(old_session)
         old_context.created_at = old_time
@@ -427,8 +545,8 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date", "cat", "dog", "bird", "fish"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=2,  # 16 - 2*4 = 8 remaining words
+            llm_model_config="gpt-4",
         )
 
         context = self.service.create_context_for_session(session)
@@ -469,8 +587,8 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=3,  # 16 - 3*4 = 4 remaining words
+            llm_model_config="gpt-4",
         )
 
         self.service.create_context_for_session(session)
@@ -506,16 +624,33 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=3,  # 16 - 3*4 = 4 remaining words
+            llm_model_config="gpt-4",
         )
 
         session2 = Session(
             id="session_2",
             puzzle_id="puzzle_2",
-            remaining_words=["cat", "dog", "bird", "fish"],
+            remaining_words=[
+                "cat",
+                "dog",
+                "bird",
+                "fish",
+                "word5",
+                "word6",
+                "word7",
+                "word8",
+                "word9",
+                "word10",
+                "word11",
+                "word12",
+                "word13",
+                "word14",
+                "word15",
+                "word16",
+            ],
             solved_groups=[],
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
         )
 
         context1 = self.service.create_context_for_session(session1)
@@ -535,8 +670,8 @@ class TestContextService:
             id="session_1",
             puzzle_id="puzzle_1",
             remaining_words=["apple", "banana", "cherry", "date", "cat", "dog", "bird", "fish"],
-            solved_groups=[],
-            llm_model="gpt-4",
+            solved_groups_count=2,  # 16 - 2*4 = 8 remaining words
+            llm_model_config="gpt-4",
         )
 
         context = self.service.create_context_for_session(session)
@@ -552,4 +687,4 @@ class TestContextService:
         assert len(context.incorrect_groups) == 1  # Preserved
         assert len(context.one_away_groups) == 1  # Preserved
         assert context.incorrect_groups[0] == ["wrong1", "wrong2", "wrong3", "wrong4"]
-        assert context.one_away_groups[0].attempted_words == ["close1", "close2", "close3", "close4"]
+        assert context.one_away_groups[0].words == ["close1", "close2", "close3", "close4"]

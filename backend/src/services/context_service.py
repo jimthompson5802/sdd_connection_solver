@@ -1,6 +1,6 @@
 """Context service for managing AI recommendation context data."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
 
 from ..models.ai_context import AIRecommendationContext
@@ -138,13 +138,12 @@ class ContextService:
 
         # Create one-away group
         one_away_group = OneAwayGroup(
-            attempted_words=attempted_words,
-            correct_connection=correct_connection,
-            incorrect_word_hint=incorrect_word_hint,
+            words=attempted_words,
+            explanation=correct_connection if correct_connection else f"One away group: {', '.join(attempted_words)}",
         )
 
         # Add to one-away groups if not already present
-        existing_attempts = [group.attempted_words for group in context.one_away_groups]
+        existing_attempts = [group.words for group in context.one_away_groups]
         if attempted_words not in existing_attempts:
             context.one_away_groups.append(one_away_group)
             context.created_at = datetime.now()
@@ -183,9 +182,8 @@ class ContextService:
             "one_away_attempts_count": len(context.one_away_groups),
             "one_away_groups": [
                 {
-                    "attempted_words": group.attempted_words,
-                    "correct_connection": group.correct_connection,
-                    "incorrect_word_hint": group.incorrect_word_hint,
+                    "words": group.words,
+                    "explanation": group.explanation,
                 }
                 for group in context.one_away_groups
             ],
@@ -250,7 +248,7 @@ class ContextService:
         Returns:
             Number of contexts cleaned up
         """
-        cutoff_time = datetime.now().replace(hour=datetime.now().hour - max_age_hours)
+        cutoff_time = datetime.now() - timedelta(hours=max_age_hours)
 
         contexts_to_remove = []
         for session_id, context in self._contexts.items():

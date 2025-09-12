@@ -28,7 +28,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -63,7 +63,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "cat", "cherry", "date"],
             explanation="Random words",
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -94,7 +94,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "grape"],
             explanation="Types of fruit",
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -115,7 +115,7 @@ class TestEvaluationService:
         # Check context was updated
         assert updated_context is not None
         assert len(updated_context.one_away_groups) == 1
-        assert updated_context.one_away_groups[0].attempted_words == ["apple", "banana", "cherry", "grape"]
+        assert updated_context.one_away_groups[0].words == ["apple", "banana", "cherry", "grape"]
         assert updated_context.remaining_words == ["apple", "banana", "cherry", "date", "grape", "dog", "bird", "fish"]
 
     def test_evaluate_recommendation_invalid_evaluation(self):
@@ -125,7 +125,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -139,7 +139,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -159,7 +159,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -195,7 +195,7 @@ class TestEvaluationService:
                 session_id="session_1",
                 recommended_words=[f"word{j}" for j in range(i * 4, (i + 1) * 4)],
                 explanation=f"Explanation {i}",
-                llm_model="gpt-4",
+                llm_model_config="gpt-4",
                 processing_time_ms=1000 + i * 200,
             )
             self.service.evaluate_recommendation(recommendation, evaluation)
@@ -218,7 +218,7 @@ class TestEvaluationService:
                 session_id="session_1",
                 recommended_words=[f"word{j}" for j in range(i * 4, (i + 1) * 4)],
                 explanation=f"Explanation {i}",
-                llm_model="gpt-4",
+                llm_model_config="gpt-4",
                 processing_time_ms=1000,
             )
             self.service.evaluate_recommendation(recommendation, evaluation)
@@ -238,7 +238,7 @@ class TestEvaluationService:
                 session_id="session_1",
                 recommended_words=[f"word{j}" for j in range(i * 4, (i + 1) * 4)],
                 explanation=f"Explanation {i}",
-                llm_model="gpt-4",
+                llm_model_config="gpt-4",
                 processing_time_ms=1000,
             )
             self.service.evaluate_recommendation(recommendation, evaluation)
@@ -257,7 +257,7 @@ class TestEvaluationService:
                 session_id="session_1",
                 recommended_words=[f"word{j}" for j in range(i * 4, (i + 1) * 4)],
                 explanation=f"Explanation {i}",
-                llm_model="gpt-4",
+                llm_model_config="gpt-4",
                 processing_time_ms=1000,
             )
             self.service.evaluate_recommendation(recommendation, evaluation)
@@ -276,7 +276,7 @@ class TestEvaluationService:
                 session_id="session_1",
                 recommended_words=[f"word{j}" for j in range(i * 4, (i + 1) * 4)],
                 explanation=f"Explanation {i}",
-                llm_model="gpt-4",
+                llm_model_config="gpt-4",
                 processing_time_ms=3000,  # Slow processing
             )
             self.service.evaluate_recommendation(recommendation, "correct")
@@ -356,7 +356,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -374,7 +374,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -405,7 +405,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -440,7 +440,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -461,7 +461,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model="gpt-4",
+            llm_model_config="gpt-4",
             processing_time_ms=0,
         )
 

@@ -29,7 +29,7 @@ class AIRecommendationContext(BaseModel):
 
     id: str = Field(default_factory=lambda: str(uuid4()))
     session_id: str = Field(..., min_length=1)
-    remaining_words: List[str] = Field(..., min_items=4, max_items=16)
+    remaining_words: List[str] = Field(..., max_items=16)
     incorrect_groups: List[List[str]] = Field(default_factory=list)
     one_away_groups: List[OneAwayGroup] = Field(default_factory=list)
     solved_groups: List[Group] = Field(default_factory=list)
@@ -49,8 +49,12 @@ class AIRecommendationContext(BaseModel):
         Raises:
             ValueError: If validation fails
         """
-        if not (4 <= len(v) <= 16):
-            raise ValueError("Remaining words must contain 4-16 words depending on game progress")
+        if not (0 <= len(v) <= 16):
+            raise ValueError("Remaining words must contain 0-16 words depending on game progress")
+
+        # Allow empty list when game is completed
+        if len(v) == 0:
+            return v
 
         # Check for empty words
         if any(not word.strip() for word in v):
