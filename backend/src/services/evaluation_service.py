@@ -85,8 +85,7 @@ class EvaluationService:
             solved_group = Group(
                 words=recommendation.recommended_words,
                 theme=recommendation.explanation,
-                difficulty_level=1,  # Default difficulty
-                position=len(updated_context.solved_groups) + 1,
+                difficulty="yellow",  # Default difficulty
             )
             updated_context.solved_groups.append(solved_group)
 

@@ -173,7 +173,7 @@ class TestPromptTemplateManager:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
-        )
+            llm_prompt_template="default_template",        )
 
         result = self.manager.generate_prompt("initial_recommendation", ai_context)
 
@@ -188,7 +188,7 @@ class TestPromptTemplateManager:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
-        )
+            llm_prompt_template="default_template",        )
 
         with pytest.raises(ValueError, match="Template 'nonexistent' not found"):
             self.manager.generate_prompt("nonexistent", ai_context)
@@ -200,7 +200,7 @@ class TestPromptTemplateManager:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
-        )
+            llm_prompt_template="default_template",        )
 
         template_name = self.manager.select_template(ai_context)
 
@@ -213,7 +213,7 @@ class TestPromptTemplateManager:
             solved_groups=[],
             incorrect_groups=[["word1", "word2", "word3", "word4"]],
             one_away_groups=[],
-        )
+            llm_prompt_template="default_template",        )
 
         template_name = self.manager.select_template(ai_context)
 
@@ -221,7 +221,7 @@ class TestPromptTemplateManager:
 
     def test_select_template_one_away_focused(self):
         """Test template selection for one-away focused recommendation."""
-        one_away_group = OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away!")
+        one_away_group = OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away from correct group")
         ai_context = AIRecommendationContext(
             remaining_words=["apple", "banana", "cherry", "date"],
             solved_groups=[],
@@ -244,7 +244,7 @@ class TestPromptTemplateManager:
                 ["word9", "word10", "word11", "word12"],
             ],
             one_away_groups=[],
-        )
+            llm_prompt_template="default_template",        )
 
         template_name = self.manager.select_template(ai_context)
 
@@ -257,7 +257,7 @@ class TestPromptTemplateManager:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
-        )
+            llm_prompt_template="default_template",        )
 
         context = self.manager._build_context_variables(ai_context)
 
@@ -275,8 +275,8 @@ class TestPromptTemplateManager:
 
     def test_build_context_variables_full(self):
         """Test building context variables with full AI context."""
-        solved_group = Group(words=["red", "blue", "green", "yellow"], theme="Colors", difficulty="easy")
-        one_away_group = OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away!")
+        solved_group = Group(words=["red", "blue", "green", "yellow"], theme="Colors", difficulty="yellow")
+        one_away_group = OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away from correct group")
 
         ai_context = AIRecommendationContext(
             remaining_words=["apple", "banana", "cherry", "date"],
@@ -307,7 +307,7 @@ class TestPromptTemplateManager:
     def test_format_solved_groups_multiple(self):
         """Test formatting multiple solved groups."""
         groups = [
-            Group(words=["red", "blue", "green", "yellow"], theme="Colors", difficulty="easy"),
+            Group(words=["red", "blue", "green", "yellow"], theme="Colors", difficulty="yellow"),
             Group(words=["cat", "dog", "bird", "fish"], theme="Animals", difficulty="medium"),
         ]
 
@@ -343,8 +343,8 @@ class TestPromptTemplateManager:
     def test_format_one_away_attempts_multiple(self):
         """Test formatting multiple one-away attempts."""
         attempts = [
-            OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away!"),
-            OneAwayGroup(words=["cat", "dog", "bird", "snake"], explanation="One away!"),
+            OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away from correct group"),
+            OneAwayGroup(words=["cat", "dog", "bird", "snake"], explanation="One away from correct group"),
         ]
 
         result = self.manager._format_one_away_attempts(attempts)
@@ -363,7 +363,7 @@ class TestPromptGeneration:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
-        )
+            llm_prompt_template="default_template",        )
 
         result = get_prompt_for_context(ai_context)
 
@@ -378,7 +378,7 @@ class TestPromptGeneration:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
-        )
+            llm_prompt_template="default_template",        )
 
         result = get_prompt_for_context(ai_context, template_name="context_aware_recommendation")
 
@@ -393,7 +393,7 @@ class TestPromptGeneration:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
-        )
+            llm_prompt_template="default_template",        )
 
         # Custom template that uses extra variables
         custom_template = PromptTemplate(
@@ -452,7 +452,7 @@ class TestPromptGeneration:
             remaining_words=["apple", "banana", "cherry", "date"],
             solved_groups=[],
             incorrect_groups=[["word1", "word2", "word3", "word4"]],
-            one_away_groups=[OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away!")],
+            one_away_groups=[OneAwayGroup(words=["apple", "banana", "cherry", "grape"], explanation="One away from correct group")],
         )
 
         # Test that all default templates can be rendered without errors
@@ -474,7 +474,7 @@ class TestPromptGeneration:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
-        )
+            llm_prompt_template="default_template",        )
 
         # Test context with attempts
         context_with_attempts = AIRecommendationContext(
@@ -482,7 +482,7 @@ class TestPromptGeneration:
             solved_groups=[],
             incorrect_groups=[["word1", "word2", "word3", "word4"]],
             one_away_groups=[],
-        )
+            llm_prompt_template="default_template",        )
 
         initial_prompt = get_prompt_for_context(initial_context)
         context_prompt = get_prompt_for_context(context_with_attempts)

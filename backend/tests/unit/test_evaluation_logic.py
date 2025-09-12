@@ -28,7 +28,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model_config="gpt-4",
+            llm_model="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -38,6 +38,7 @@ class TestEvaluationService:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
+            llm_prompt_template="default_template",
         )
 
         with patch("src.services.evaluation_service.datetime") as mock_datetime:
@@ -63,7 +64,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "cat", "cherry", "date"],
             explanation="Random words",
-            llm_model_config="gpt-4",
+            llm_model="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -73,6 +74,7 @@ class TestEvaluationService:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
+            llm_prompt_template="default_template",
         )
 
         updated_rec, updated_context = self.service.evaluate_recommendation(recommendation, "incorrect", context)
@@ -94,7 +96,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "grape"],
             explanation="Types of fruit",
-            llm_model_config="gpt-4",
+            llm_model="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -104,6 +106,7 @@ class TestEvaluationService:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
+            llm_prompt_template="default_template",
         )
 
         updated_rec, updated_context = self.service.evaluate_recommendation(recommendation, "one_away", context)
@@ -125,7 +128,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model_config="gpt-4",
+            llm_model="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -139,7 +142,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model_config="gpt-4",
+            llm_model="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -159,7 +162,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model_config="gpt-4",
+            llm_model="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -195,7 +198,7 @@ class TestEvaluationService:
                 session_id="session_1",
                 recommended_words=[f"word{j}" for j in range(i * 4, (i + 1) * 4)],
                 explanation=f"Explanation {i}",
-                llm_model_config="gpt-4",
+                llm_model="gpt-4",
                 processing_time_ms=1000 + i * 200,
             )
             self.service.evaluate_recommendation(recommendation, evaluation)
@@ -218,7 +221,7 @@ class TestEvaluationService:
                 session_id="session_1",
                 recommended_words=[f"word{j}" for j in range(i * 4, (i + 1) * 4)],
                 explanation=f"Explanation {i}",
-                llm_model_config="gpt-4",
+                llm_model="gpt-4",
                 processing_time_ms=1000,
             )
             self.service.evaluate_recommendation(recommendation, evaluation)
@@ -238,7 +241,7 @@ class TestEvaluationService:
                 session_id="session_1",
                 recommended_words=[f"word{j}" for j in range(i * 4, (i + 1) * 4)],
                 explanation=f"Explanation {i}",
-                llm_model_config="gpt-4",
+                llm_model="gpt-4",
                 processing_time_ms=1000,
             )
             self.service.evaluate_recommendation(recommendation, evaluation)
@@ -257,7 +260,7 @@ class TestEvaluationService:
                 session_id="session_1",
                 recommended_words=[f"word{j}" for j in range(i * 4, (i + 1) * 4)],
                 explanation=f"Explanation {i}",
-                llm_model_config="gpt-4",
+                llm_model="gpt-4",
                 processing_time_ms=1000,
             )
             self.service.evaluate_recommendation(recommendation, evaluation)
@@ -276,7 +279,7 @@ class TestEvaluationService:
                 session_id="session_1",
                 recommended_words=[f"word{j}" for j in range(i * 4, (i + 1) * 4)],
                 explanation=f"Explanation {i}",
-                llm_model_config="gpt-4",
+                llm_model="gpt-4",
                 processing_time_ms=3000,  # Slow processing
             )
             self.service.evaluate_recommendation(recommendation, "correct")
@@ -356,7 +359,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model_config="gpt-4",
+            llm_model="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -374,7 +377,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model_config="gpt-4",
+            llm_model="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -398,6 +401,7 @@ class TestEvaluationService:
             solved_groups=[],
             incorrect_groups=[],
             one_away_groups=[],
+            llm_prompt_template="default_template",
         )
 
         recommendation = Recommendation(
@@ -405,7 +409,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model_config="gpt-4",
+            llm_model="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -425,7 +429,7 @@ class TestEvaluationService:
 
     def test_evaluation_with_existing_solved_groups(self):
         """Test evaluation when context already has solved groups."""
-        existing_group = Group(words=["red", "blue", "green", "yellow"], theme="Colors", difficulty_level=1, position=1)
+        existing_group = Group(words=["red", "blue", "green", "yellow"], theme="Colors", difficulty="yellow")
 
         context = AIRecommendationContext(
             session_id="session_1",
@@ -433,6 +437,7 @@ class TestEvaluationService:
             solved_groups=[existing_group],
             incorrect_groups=[],
             one_away_groups=[],
+            llm_prompt_template="default_template",
         )
 
         recommendation = Recommendation(
@@ -440,7 +445,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model_config="gpt-4",
+            llm_model="gpt-4",
             processing_time_ms=1500,
         )
 
@@ -461,7 +466,7 @@ class TestEvaluationService:
             session_id="session_1",
             recommended_words=["apple", "banana", "cherry", "date"],
             explanation="Types of fruit",
-            llm_model_config="gpt-4",
+            llm_model="gpt-4",
             processing_time_ms=0,
         )
 

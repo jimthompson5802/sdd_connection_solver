@@ -75,7 +75,27 @@ class TestAPIResponseTimes:
         """Mock session service for testing."""
         with patch("src.api.sessions.session_service") as mock:
             mock_session = Session(
-                id="test-session-123", puzzle_id="test-puzzle-123", llm_model_config="gpt-4", user_id="test-user"
+                id="test-session-123",
+                puzzle_id="test-puzzle-123",
+                llm_model_config="gpt-4",
+                remaining_words=[
+                    "word1",
+                    "word2",
+                    "word3",
+                    "word4",
+                    "word5",
+                    "word6",
+                    "word7",
+                    "word8",
+                    "word9",
+                    "word10",
+                    "word11",
+                    "word12",
+                    "word13",
+                    "word14",
+                    "word15",
+                    "word16",
+                ],
             )
             mock.create_session.return_value = mock_session
             mock.get_session.return_value = mock_session
@@ -369,10 +389,6 @@ class TestMemoryEfficiency:
         # Should handle response generation quickly
         assert elapsed_time < 0.01, f"Response generation took {elapsed_time*1000:.0f}ms, should be under 10ms"
         assert len(json_response) > 0
-
-
-class TestEndpointSpecificTiming:
-    """Test timing for specific endpoint patterns."""
 
     def test_path_parameter_processing(self, client: TestClient):
         """Test that path parameter processing is fast."""

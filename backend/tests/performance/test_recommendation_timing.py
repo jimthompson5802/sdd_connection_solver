@@ -53,7 +53,7 @@ class TestRecommendationTiming:
         start_time = time.time()
 
         recommendation = await llm_service.generate_recommendation(
-            session_id=session_id, context=sample_context, llm_model_config="gpt-4"
+            session_id=session_id, context=sample_context, llm_model="gpt-4"
         )
 
         elapsed_time = time.time() - start_time
@@ -76,7 +76,7 @@ class TestRecommendationTiming:
         start_time = time.time()
 
         recommendation = await recommendation_engine.generate_recommendation(
-            session_id=session_id, context=sample_context, llm_model_config="gpt-4"
+            session_id=session_id, ai_context=sample_context, llm_model="gpt-4"
         )
 
         elapsed_time = time.time() - start_time
@@ -117,9 +117,7 @@ class TestRecommendationTiming:
         async def generate_single_recommendation(session_id: str) -> float:
             """Generate single recommendation and return elapsed time."""
             start_time = time.time()
-            await llm_service.generate_recommendation(
-                session_id=session_id, context=sample_context, llm_model_config="gpt-4"
-            )
+            await llm_service.generate_recommendation(session_id=session_id, context=sample_context, llm_model="gpt-4")
             return time.time() - start_time
 
         start_time = time.time()
@@ -160,7 +158,7 @@ class TestRecommendationTiming:
         start_time = time.time()
 
         recommendation = await llm_service.generate_recommendation(
-            session_id=session_id, context=large_context, llm_model_config="gpt-4"
+            session_id=session_id, context=large_context, llm_model="gpt-4"
         )
 
         elapsed_time = time.time() - start_time
@@ -182,7 +180,7 @@ class TestRecommendationTiming:
         for i in range(10):
             start_time = time.time()
             await llm_service.generate_recommendation(
-                session_id=f"{session_id}-{i}", context=sample_context, llm_model_config="gpt-4"
+                session_id=f"{session_id}-{i}", context=sample_context, llm_model="gpt-4"
             )
             elapsed_times.append(time.time() - start_time)
 
@@ -204,7 +202,7 @@ class TestRecommendationTiming:
         session_id = "test-processing-time-tracking"
 
         recommendation = await llm_service.generate_recommendation(
-            session_id=session_id, context=sample_context, llm_model_config="gpt-4"
+            session_id=session_id, context=sample_context, llm_model="gpt-4"
         )
 
         # Processing time should be reasonable (in milliseconds)
@@ -239,7 +237,7 @@ class TestRecommendationMemoryUsage:
         # Generate many recommendations to test for memory leaks
         for i in range(50):
             recommendation = await llm_service.generate_recommendation(
-                session_id=f"memory-test-{i}", context=sample_context, llm_model_config="gpt-4"
+                session_id=f"memory-test-{i}", context=sample_context, llm_model="gpt-4"
             )
 
             # Verify each recommendation is generated correctly
@@ -257,7 +255,7 @@ class TestRecommendationMemoryUsage:
 
         # Generate recommendation
         recommendation = await llm_service.generate_recommendation(
-            session_id="cleanup-test", context=sample_context, llm_model_config="gpt-4"
+            session_id="cleanup-test", context=sample_context, llm_model="gpt-4"
         )
 
         # Verify recommendation was generated
@@ -289,7 +287,7 @@ class TestPerformanceEdgeCases:
         start_time = time.time()
 
         recommendation = await llm_service.generate_recommendation(
-            session_id="minimal-context-test", context=minimal_context, llm_model_config="gpt-4"
+            session_id="minimal-context-test", context=minimal_context, llm_model="gpt-4"
         )
 
         elapsed_time = time.time() - start_time
@@ -316,7 +314,7 @@ class TestPerformanceEdgeCases:
         start_time = time.time()
 
         recommendation = await llm_service.generate_recommendation(
-            session_id="maximum-context-test", context=max_context, llm_model_config="gpt-4"
+            session_id="maximum-context-test", context=max_context, llm_model="gpt-4"
         )
 
         elapsed_time = time.time() - start_time
