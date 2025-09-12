@@ -1,103 +1,72 @@
 /**
  * Main TypeScript entry point for NYT Connections Puzzle Assistant Frontend
  * 
- * This module initializes the application and sets up the basic structure
- * for the web application. Components will be added in subsequent tasks.
+ * This module initializes the full application using the App class
+ * with all implemented components (T041-T046).
  */
 
-// Application state interface
-interface AppState {
-  initialized: boolean;
-  currentView: 'home' | 'puzzle' | 'session';
-  debugMode: boolean;
-}
-
-// Global application state
-const appState: AppState = {
-  initialized: false,
-  currentView: 'home',
-  debugMode: false
-};
+import { App } from './App';
 
 /**
- * Initialize the application
+ * Initialize the full application with all components
  */
-function initializeApp(): void {
-  console.log('NYT Connections Puzzle Assistant - TypeScript Frontend loaded');
+async function initializeApp(): Promise<void> {
+  console.log('NYT Connections Puzzle Assistant - Starting Full Application...');
   
-  // Set up event listeners for basic interactions
-  setupEventListeners();
-  
-  // Mark app as initialized
-  appState.initialized = true;
-  
-  console.log('Application initialized successfully');
-}
+  try {
+    // Create and initialize the main App instance
+    const app = new App('app', {
+      apiBaseUrl: 'http://localhost:8000',
+      wsBaseUrl: 'ws://localhost:8000',
+      debugMode: true, // Enable debug mode for development
+      autoConnect: true
+    });
 
-/**
- * Set up basic event listeners
- */
-function setupEventListeners(): void {
-  // DOM content loaded handler
-  document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM content loaded');
-    updateUI();
-  });
-
-  // Handle window resize for responsive design
-  window.addEventListener('resize', () => {
-    console.log('Window resized');
-    // Future: Update layout based on screen size
-  });
-}
-
-/**
- * Update the UI based on current application state
- */
-function updateUI(): void {
-  const appElement = document.getElementById('app');
-  if (!appElement) {
-    console.error('App element not found');
-    return;
-  }
-
-  // Update the main content based on current view
-  const mainElement = appElement.querySelector('main');
-  if (mainElement) {
-    switch (appState.currentView) {
-      case 'home':
-        mainElement.innerHTML = `
-          <div class="home-view">
-            <p class="welcome-message">Welcome to the NYT Connections Puzzle Assistant!</p>
-            <div class="placeholder-content">
-              <p>Frontend components will be added in subsequent tasks:</p>
-              <ul>
-                <li>File upload component (T041)</li>
-                <li>Puzzle display component (T042)</li>
-                <li>Recommendation cards (T043)</li>
-                <li>Evaluation buttons (T044)</li>
-                <li>Session status (T045)</li>
-                <li>History view (T046)</li>
-              </ul>
-            </div>
-          </div>
-        `;
-        break;
-      default:
-        mainElement.innerHTML = '<p>Loading...</p>';
+    // Initialize the application
+    await app.init();
+    
+    console.log('Application initialized successfully with all components');
+    
+    // Make app instance available globally for debugging
+    (window as any).app = app;
+    
+  } catch (error) {
+    console.error('Failed to initialize application:', error);
+    
+    // Show error in the app container
+    const appElement = document.getElementById('app');
+    if (appElement) {
+      appElement.innerHTML = `
+        <div class="error-container">
+          <h1>Application Error</h1>
+          <p>Failed to initialize the NYT Connections Puzzle Assistant.</p>
+          <p>Error: ${error instanceof Error ? error.message : 'Unknown error'}</p>
+          <p>Please check the console for more details.</p>
+        </div>
+      `;
     }
   }
 }
 
 /**
- * Get current application state (for debugging)
+ * Setup event listeners for application startup
  */
-function getAppState(): AppState {
-  return { ...appState };
+function setupEventListeners(): void {
+  // DOM content loaded handler
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM content loaded - initializing app...');
+    initializeApp();
+  });
+
+  // Handle window resize for responsive design
+  window.addEventListener('resize', () => {
+    console.log('Window resized');
+    // The App class will handle responsive updates
+  });
 }
 
-// Initialize app when script loads
-initializeApp();
+// Setup event listeners when script loads
+setupEventListeners();
 
 // Export for potential use by other modules
-export { initializeApp, getAppState, appState };
+export { initializeApp };
