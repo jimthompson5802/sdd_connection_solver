@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
 
 from ..services.llm_service import LLMService
-from ..storage.session_storage import InMemorySessionStorage
+from ..storage.session_storage import InMemoryStorage
 
 
 router = APIRouter(tags=["Health"])
@@ -38,7 +38,7 @@ async def health_check_database() -> Dict[str, Any]:
     """
     try:
         # Initialize storage and test basic operations
-        storage = InMemorySessionStorage()
+        storage = InMemoryStorage()
 
         # Test storage connectivity by attempting a basic operation
         # Since it's in-memory, we'll test initialization and basic functionality
@@ -58,8 +58,8 @@ async def health_check_database() -> Dict[str, Any]:
         test_session = Session(session_id="health-check-session", puzzle_id="health-check-test", created_at=test_start)
 
         # Test storage operations
-        await storage.store_puzzle(test_puzzle)
-        await storage.store_session(test_session)
+        await storage.create_puzzle(test_puzzle)
+        await storage.create_session(test_session)
 
         # Verify retrieval works
         retrieved_puzzle = await storage.get_puzzle("health-check-test")

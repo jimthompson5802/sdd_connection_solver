@@ -65,6 +65,7 @@ python_classes = "Test*"
 python_functions = "test_*"
 addopts = "-v --tb=short"
 asyncio_mode = "auto"
+pythonpath = ["."]
 
 [tool.mypy]
 python_version = "3.12"
