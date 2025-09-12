@@ -132,10 +132,10 @@
 ## Phase 3.5: Polish
 
 ### Unit Tests
-- [ ] T059 [P] Unit tests for puzzle validation logic in backend/tests/unit/test_puzzle_validation.py
-- [ ] T060 [P] Unit tests for LLM prompt generation in backend/tests/unit/test_prompt_generation.py
-- [ ] T061 [P] Unit tests for evaluation processing in backend/tests/unit/test_evaluation_logic.py
-- [ ] T062 [P] Unit tests for context management in backend/tests/unit/test_context_service.py
+- [x] T059 [P] Unit tests for puzzle validation logic in backend/tests/unit/test_puzzle_validation.py
+- [x] T060 [P] Unit tests for LLM prompt generation in backend/tests/unit/test_prompt_generation.py
+- [x] T061 [P] Unit tests for evaluation processing in backend/tests/unit/test_evaluation_logic.py
+- [x] T062 [P] Unit tests for context management in backend/tests/unit/test_context_service.py
 
 ### Performance and Validation
 - [ ] T063 Performance tests for AI recommendation generation (<2 seconds) in backend/tests/performance/test_recommendation_timing.py
