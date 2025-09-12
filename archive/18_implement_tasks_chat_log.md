@@ -534,4 +534,32 @@ Errors  Files
      6  src/App.ts:368
      1  src/services/ApiService.ts:71
 ((venv) ) Mac:jim frontend[491]$ 
+
+((venv) ) Mac:jim backend[511]$ python -m pytest tests -q
+========================================================================= test session starts =========================================================================
+platform darwin -- Python 3.12.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: /Users/jim/Desktop/genai/sdd_connection_solver/backend
+configfile: pyproject.toml
+plugins: asyncio-1.1.0, mock-3.15.0, anyio-4.10.0, langsmith-0.4.27
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 97 items                                                                                                                                                    
+
+tests/contract/test_history.py FFF.FFFFF                                                                                                                        [  9%]
+tests/contract/test_puzzles_get.py FFF.F.FFF                                                                                                                    [ 18%]
+tests/contract/test_puzzles_upload.py ......F...                                                                                                                [ 28%]
+tests/contract/test_recommendations_create.py FF.....FFFF                                                                                                       [ 40%]
+tests/contract/test_recommendations_evaluate.py FFF.F..FF..F                                                                                                    [ 52%]
+tests/contract/test_recommendations_get.py F..F.......                                                                                                          [ 63%]
+tests/contract/test_sessions_create.py FFF...FFFFF                                                                                                              [ 75%]
+tests/contract/test_sessions_get.py FFFFFF.FFFFF                                                                                                                [ 87%]
+tests/integration/test_ai_recommendations.py FF                                                                                                                 [ 89%]
+tests/integration/test_complete_game.py F                                                                                                                       [ 90%]
+tests/integration/test_evaluation_flow.py F                                                                                                                     [ 91%]
+tests/integration/test_puzzle_upload_flow.py F..F.                                                                                                              [ 96%]
+tests/integration/test_session_creation.py FFF                                                                                                                  [100%]
+
+FAILED tests/integration/test_session_creation.py::TestSessionCreationIntegration::test_complete_session_creation_workflow - assert 400 == 201
+FAILED tests/integration/test_session_creation.py::TestSessionCreationIntegration::test_session_remaining_words_initialization - assert 400 == 201
+FAILED tests/integration/test_session_creation.py::TestSessionCreationIntegration::test_session_multiple_users_same_puzzle - assert 400 == 201
+============================================================= 59 failed, 38 passed, 51 warnings in 0.47s ==============================================================
 ```
