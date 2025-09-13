@@ -45,6 +45,8 @@ def seed_puzzles_for_contract_tests():
         "87654321-4321-8765-4321-876543210987",
         "11111111-2222-3333-4444-555555555555",
         "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "22222222-3333-4444-5555-666666666666",
+        "33333333-4444-5555-6666-777777777777",
         "ffff1111-2222-3333-4444-555566667777",
         "12ab34cd-56ef-78gh-90ij-klmnopqrstuv",
     ]
@@ -200,6 +202,16 @@ def seed_puzzles_for_contract_tests():
             recommendations_mod = importlib.import_module(f"{pkg_prefix}.api.recommendations")
             setattr(history_mod, "session_service", session_service)
             setattr(sessions_mod, "session_service", session_service)
+            # Ensure the sessions and recommendations modules use the same PuzzleService
+            # instance seeded above so API endpoints can find the example puzzles.
+            try:
+                setattr(sessions_mod, "puzzle_service", service)
+            except Exception:
+                pass
+            try:
+                setattr(recommendations_mod, "puzzle_service", service)
+            except Exception:
+                pass
             setattr(recommendations_mod, "session_service", session_service)
         except Exception:
             pass
