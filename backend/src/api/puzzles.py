@@ -3,6 +3,8 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from typing import Optional
 
+from uuid import UUID
+
 from ..services.puzzle_service import PuzzleService
 
 
@@ -63,6 +65,11 @@ async def get_puzzle(puzzle_id: str):
     Raises:
         HTTPException: If puzzle is not found
     """
+    try:
+        UUID(puzzle_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail={"error": "INVALID_ID", "message": "Invalid UUID format"})
+
     try:
         # Note: Contract tests include non-strict UUID-like identifiers; avoid forcing strict UUID parsing here.
         puzzle = puzzle_service.get_puzzle(puzzle_id)
