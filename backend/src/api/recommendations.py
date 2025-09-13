@@ -117,12 +117,28 @@ async def get_current_recommendation(session_id: str):
         HTTPException: If no pending recommendation exists
     """
     try:
+        # Validate UUID format for session — return 400 for malformed UUIDs
+        try:
+            UUID(session_id)
+        except Exception:
+            raise HTTPException(
+                status_code=400,
+                detail={"error": "INVALID_SESSION_UUID", "message": f"Session ID {session_id} is not a valid UUID"},
+            )
+
         # Get session
         session = session_service.get_session(session_id)
         if session is None:
             raise HTTPException(
                 status_code=404,
                 detail={"error": "SESSION_NOT_FOUND", "message": f"Session with ID {session_id} not found"},
+            )
+
+        # If session is not active, treat as having no pending recommendation
+        if getattr(session, "status", "active") != "active":
+            raise HTTPException(
+                status_code=404,
+                detail={"error": "NO_PENDING_RECOMMENDATION", "message": "No pending recommendation found for session"},
             )
 
         # Get current recommendation from session history

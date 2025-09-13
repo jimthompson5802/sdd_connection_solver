@@ -81,19 +81,19 @@ class TestRecommendationsGetContract:
         if client is None:
             pytest.fail("FastAPI app not implemented - contract test intentionally failing")
 
-        # Session with no pending recommendation
-        test_session_id = "87654321-4321-8765-4321-876543210987"
+    # Session with no pending recommendation (use session seeded as completed/no-pending)
+    test_session_id = "ffff1111-2222-3333-4444-555566667777"
 
-        response = client.get(f"/api/v1/sessions/{test_session_id}/recommendations")
+    response = client.get(f"/api/v1/sessions/{test_session_id}/recommendations")
 
-        # Contract validation: Not found response
-        assert response.status_code == 404, f"Expected 404, got {response.status_code}"
+    # Contract validation: Not found response
+    assert response.status_code == 404, f"Expected 404, got {response.status_code}"
 
-        json_data = response.json()
-        assert "error" in json_data, "Error response must have 'error' field"
-        assert "message" in json_data, "Error response must have 'message' field"
-        assert isinstance(json_data["error"], str), "error field must be string"
-        assert isinstance(json_data["message"], str), "message field must be string"
+    json_data = response.json()
+    assert "error" in json_data, "Error response must have 'error' field"
+    assert "message" in json_data, "Error response must have 'message' field"
+    assert isinstance(json_data["error"], str), "error field must be string"
+    assert isinstance(json_data["message"], str), "message field must be string"
 
     def test_get_recommendation_nonexistent_session(self):
         """Test error response for non-existent session ID."""
