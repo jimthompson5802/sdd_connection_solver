@@ -9,12 +9,8 @@ from ..models.ai_context import AIRecommendationContext
 
 
 router = APIRouter(prefix="/api/v1/sessions", tags=["AI Recommendations"])
-session_service = session_service
-llm_service = llm_service
-evaluation_service = evaluation_service
+# Use imported services directly without reassignment
 
-
-class EvaluateRecommendationRequest(BaseModel):
     """Request model for evaluating a recommendation."""
 
     evaluation: str
@@ -266,9 +262,9 @@ async def evaluate_recommendation(session_id: str, recommendation_id: str, reque
                 # If solve_group fails, continue but flag internal error
                 pass
 
-        elif request.evaluation == "incorrect":
-            session_service.increment_incorrect_evaluation(session_id)
-
+            except ValueError:
+                # If solve_group fails due to invalid group, continue but flag internal error
+                pass
         elif request.evaluation == "one_away":
             # For one-away, no special session-level action besides marking evaluation
             pass

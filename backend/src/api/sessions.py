@@ -10,7 +10,6 @@ from ..services import session_service, puzzle_service
 
 
 router = APIRouter(prefix="/api/v1/sessions", tags=["Sessions"])
-puzzle_service = puzzle_service
 
 
 @router.get("")

@@ -7,6 +7,7 @@ These tests MUST FAIL until the actual implementation is complete.
 
 import pytest
 from fastapi.testclient import TestClient
+import io
 
 try:
     from src.main import app
@@ -24,8 +25,6 @@ class TestEvaluationFlowIntegration:
         if client is None:
             pytest.fail("FastAPI app not implemented - integration test intentionally failing")
         # Upload a puzzle and create session
-        import io
-
         puzzle_words = "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P"
         file_data = io.BytesIO(puzzle_words.encode())
         files = {"file": ("eval_test.txt", file_data, "text/plain")}

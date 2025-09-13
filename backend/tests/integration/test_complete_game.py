@@ -7,6 +7,7 @@ These tests MUST FAIL until the actual implementation is complete.
 
 import pytest
 from fastapi.testclient import TestClient
+import io
 
 try:
     from src.main import app
@@ -24,7 +25,6 @@ class TestCompleteGameIntegration:
         if client is None:
             pytest.fail("FastAPI app not implemented - integration test intentionally failing")
         # Upload puzzle, create session, retrieve session
-        import io
 
         puzzle_words = (
             "BASS,PIANO,GUITAR,DRUMS,FISH,SALMON,TROUT,TUNA,YELLOW,GREEN,BLUE,PURPLE,APPLE,BANANA,ORANGE,GRAPE"

@@ -121,8 +121,6 @@ class SessionService:
         for rec in session.recommendation_history:
             if rec.id == recommendation_id:
                 rec.user_evaluation = evaluation
-                from datetime import datetime
-
                 rec.evaluation_timestamp = datetime.now()
                 updated = True
                 break
