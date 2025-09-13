@@ -213,6 +213,28 @@ def seed_puzzles_for_contract_tests():
             except Exception:
                 pass
             setattr(recommendations_mod, "session_service", session_service)
+            # Also ensure the package-level services singleton is replaced so
+            # routers that import `from ..services import session_service` will
+            # see the seeded instance.
+            try:
+                services_mod = importlib.import_module(f"{pkg_prefix}.services")
+                # If the application already seeded example sessions during
+                # startup (e.g. main.lifespan), merge those into our test
+                # fixture's session_service so we don't lose them when we
+                # overwrite the module-level singleton.
+                try:
+                    existing = getattr(services_mod, "session_service", None)
+                    if existing is not None and hasattr(existing, "_sessions"):
+                        for k, v in existing._sessions.items():
+                            if k not in session_service._sessions:
+                                session_service._sessions[k] = v
+                except Exception:
+                    # Non-fatal: if merge fails, continue with test seeding
+                    pass
+
+                setattr(services_mod, "session_service", session_service)
+            except Exception:
+                pass
         except Exception:
             pass
 
