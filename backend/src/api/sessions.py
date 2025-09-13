@@ -6,12 +6,11 @@ from typing import Optional, List
 import uuid
 
 # Import the shared singleton session_service so tests and routers share state
-from ..services import session_service
-from ..services.puzzle_service import PuzzleService
+from ..services import session_service, puzzle_service
 
 
 router = APIRouter(prefix="/api/v1/sessions", tags=["Sessions"])
-puzzle_service = PuzzleService()
+puzzle_service = puzzle_service
 
 
 @router.get("")

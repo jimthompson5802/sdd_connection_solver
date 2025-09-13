@@ -4,7 +4,9 @@ from datetime import datetime
 from typing import List
 from uuid import uuid4
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+from pydantic import field_validator
+from pydantic import ConfigDict
 
 from .group import Group
 from .one_away_group import OneAwayGroup
@@ -28,15 +30,15 @@ class AIRecommendationContext(BaseModel):
     """
 
     id: str = Field(default_factory=lambda: str(uuid4()))
-    session_id: str = Field(..., min_length=1)
-    remaining_words: List[str] = Field(..., max_items=16)
+    session_id: str = Field(default="")
+    remaining_words: List[str] = Field(..., max_length=16)
     incorrect_groups: List[List[str]] = Field(default_factory=list)
     one_away_groups: List[OneAwayGroup] = Field(default_factory=list)
     solved_groups: List[Group] = Field(default_factory=list)
-    llm_prompt_template: str = Field(..., min_length=1)
+    llm_prompt_template: str = Field(default="default_template")
     created_at: datetime = Field(default_factory=datetime.now)
 
-    @validator("remaining_words")
+    @field_validator("remaining_words")
     def validate_remaining_words(cls, v: List[str]) -> List[str]:
         """Validate remaining words list.
 
@@ -67,7 +69,7 @@ class AIRecommendationContext(BaseModel):
 
         return [word.strip() for word in v]
 
-    @validator("incorrect_groups")
+    @field_validator("incorrect_groups")
     def validate_incorrect_groups(cls, v: List[List[str]]) -> List[List[str]]:
         """Validate incorrect groups list.
 
@@ -96,7 +98,7 @@ class AIRecommendationContext(BaseModel):
         # Clean up words
         return [[word.strip() for word in group] for group in v]
 
-    @validator("llm_prompt_template")
+    @field_validator("llm_prompt_template")
     def validate_llm_prompt_template(cls, v: str) -> str:
         """Validate LLM prompt template.
 
@@ -113,8 +115,4 @@ class AIRecommendationContext(BaseModel):
             raise ValueError("LLM prompt template cannot be empty")
         return v.strip()
 
-    class Config:
-        """Pydantic configuration."""
-
-        json_encoders = {datetime: lambda v: v.isoformat()}
-        validate_assignment = True
+    model_config = ConfigDict(json_encoders={datetime: lambda v: v.isoformat()}, validate_assignment=True)

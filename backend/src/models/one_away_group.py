@@ -3,7 +3,9 @@
 from datetime import datetime
 from typing import List
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+from pydantic import field_validator
+from pydantic import ConfigDict
 
 
 class OneAwayGroup(BaseModel):
@@ -18,11 +20,11 @@ class OneAwayGroup(BaseModel):
         OneAwayGroup instance with validation applied
     """
 
-    words: List[str] = Field(..., min_items=4, max_items=4)
+    words: List[str] = Field(..., min_length=4, max_length=4)
     explanation: str = Field(..., min_length=10, max_length=500)
     marked_at: datetime = Field(default_factory=datetime.now)
 
-    @validator("words")
+    @field_validator("words")
     def validate_words(cls, v: List[str]) -> List[str]:
         """Validate words list.
 
@@ -49,7 +51,7 @@ class OneAwayGroup(BaseModel):
 
         return [word.strip() for word in v]
 
-    @validator("explanation")
+    @field_validator("explanation")
     def validate_explanation(cls, v: str) -> str:
         """Validate explanation text.
 
@@ -71,8 +73,4 @@ class OneAwayGroup(BaseModel):
 
         return explanation
 
-    class Config:
-        """Pydantic configuration."""
-
-        json_encoders = {datetime: lambda v: v.isoformat()}
-        validate_assignment = True
+    model_config = ConfigDict(json_encoders={datetime: lambda v: v.isoformat()}, validate_assignment=True)

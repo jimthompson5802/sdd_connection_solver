@@ -4,7 +4,9 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import uuid4
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+from pydantic import field_validator
+from pydantic import ConfigDict
 
 
 class Puzzle(BaseModel):
@@ -22,12 +24,12 @@ class Puzzle(BaseModel):
     """
 
     id: str = Field(default_factory=lambda: str(uuid4()))
-    words: List[str] = Field(..., min_items=16, max_items=16)
+    words: List[str] = Field(..., min_length=16, max_length=16)
     uploaded_filename: str = Field(..., min_length=1, max_length=255)
     created_at: datetime = Field(default_factory=datetime.now)
     user_id: Optional[str] = None
 
-    @validator("words")
+    @field_validator("words")
     def validate_words(cls, v: List[str]) -> List[str]:
         """Validate words list meets requirements.
 
@@ -55,11 +57,12 @@ class Puzzle(BaseModel):
         # Check for uniqueness (case-insensitive)
         lower_words = [word.lower().strip() for word in v]
         if len(set(lower_words)) != len(lower_words):
-            raise ValueError("All words must be unique (case-insensitive)")
+            # Raise a message that mentions 'duplicate' to match integration test expectations
+            raise ValueError("Duplicate words detected: all words must be unique (case-insensitive)")
 
         return [word.strip() for word in v]
 
-    @validator("uploaded_filename")
+    @field_validator("uploaded_filename")
     def validate_filename(cls, v: str) -> str:
         """Validate uploaded filename has valid extension.
 
@@ -81,7 +84,8 @@ class Puzzle(BaseModel):
 
         return v.strip()
 
-    class Config:
-        """Pydantic configuration."""
-
-        json_encoders = {datetime: lambda v: v.isoformat()}
+    model_config = ConfigDict(
+        json_encoders={datetime: lambda v: v.isoformat()},
+        validate_assignment=True,
+        extra="forbid",
+    )

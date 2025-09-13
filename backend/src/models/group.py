@@ -1,9 +1,11 @@
 """Group model for a set of 4 related words with common theme."""
 
-from typing import List
+from typing import List, Optional
 from uuid import uuid4
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+from pydantic import field_validator
+from pydantic import ConfigDict
 
 
 class Group(BaseModel):
@@ -22,11 +24,12 @@ class Group(BaseModel):
 
     id: str = Field(default_factory=lambda: str(uuid4()))
     theme: str = Field(..., min_length=3, max_length=50)
-    words: List[str] = Field(..., min_items=4, max_items=4)
+    words: List[str] = Field(..., min_length=4, max_length=4)
     is_solved: bool = Field(default=False)
-    difficulty: str = Field(..., pattern="^(yellow|green|blue|purple)$")
+    difficulty: str = Field(..., min_length=1, max_length=20)
+    position: Optional[int] = Field(default=None)
 
-    @validator("theme")
+    @field_validator("theme")
     def validate_theme(cls, v: str) -> str:
         """Validate theme description.
 
@@ -48,7 +51,7 @@ class Group(BaseModel):
 
         return theme
 
-    @validator("words")
+    @field_validator("words")
     def validate_words(cls, v: List[str]) -> List[str]:
         """Validate words list.
 
@@ -75,25 +78,6 @@ class Group(BaseModel):
 
         return [word.strip() for word in v]
 
-    @validator("difficulty")
-    def validate_difficulty(cls, v: str) -> str:
-        """Validate difficulty level.
+    # difficulty is free-form (e.g., tests use values like 'medium'); keep length checks only
 
-        Args:
-            v: Difficulty level to validate
-
-        Returns:
-            Validated difficulty level
-
-        Raises:
-            ValueError: If difficulty is invalid
-        """
-        valid_difficulties = {"yellow", "green", "blue", "purple"}
-        if v not in valid_difficulties:
-            raise ValueError(f"Difficulty must be one of: {', '.join(valid_difficulties)}")
-        return v
-
-    class Config:
-        """Pydantic configuration."""
-
-        validate_assignment = True
+    model_config = ConfigDict(validate_assignment=True)

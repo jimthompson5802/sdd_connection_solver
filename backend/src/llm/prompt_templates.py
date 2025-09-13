@@ -91,7 +91,8 @@ class PromptTemplateManager:
 
     def list_templates(self) -> List[str]:
         """Get list of available template names."""
-        return list(self.templates.keys())
+
+    return list(self.templates.keys())
 
     def generate_prompt(
         self, template_name: str, ai_context: AIRecommendationContext, **extra_context
@@ -198,7 +199,7 @@ class PromptTemplateManager:
 
         formatted = []
         for i, group in enumerate(groups, 1):
-            words_str = ", ".join(group.attempted_words)
+            words_str = ", ".join(group.words)
             formatted.append(f"One-away attempt {i}: {words_str} (close to correct group)")
 
         return "\n".join(formatted)

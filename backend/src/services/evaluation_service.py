@@ -87,6 +87,8 @@ class EvaluationService:
                 theme=recommendation.explanation,
                 difficulty="yellow",  # Default difficulty
             )
+            # assign position based on existing solved_groups length
+            solved_group.position = len(updated_context.solved_groups) + 1
             updated_context.solved_groups.append(solved_group)
 
             # Remove solved words from remaining words
@@ -99,11 +101,12 @@ class EvaluationService:
             updated_context.incorrect_groups.append(recommendation.recommended_words)
 
         elif evaluation == "one_away":
-            # Add to one-away groups for future reference
+            # Add to one-away groups for future reference (use new OneAwayGroup fields)
             one_away_group = OneAwayGroup(
-                attempted_words=recommendation.recommended_words,
-                correct_connection=None,  # Could be populated later with hints
-                incorrect_word_hint=None,
+                words=recommendation.recommended_words,
+                explanation=(
+                    recommendation.explanation or f"One away group: {', '.join(recommendation.recommended_words)}"
+                ),
             )
             updated_context.one_away_groups.append(one_away_group)
 

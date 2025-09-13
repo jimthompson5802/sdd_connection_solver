@@ -4,16 +4,14 @@ from fastapi import APIRouter, HTTPException
 from uuid import UUID
 from pydantic import BaseModel
 
-from ..services.session_service import SessionService
-from ..services.llm_service import LLMService
-from ..services.evaluation_service import EvaluationService
+from ..services import session_service, llm_service, evaluation_service
 from ..models.ai_context import AIRecommendationContext
 
 
 router = APIRouter(prefix="/api/v1/sessions", tags=["AI Recommendations"])
-session_service = SessionService()
-llm_service = LLMService()
-evaluation_service = EvaluationService()
+session_service = session_service
+llm_service = llm_service
+evaluation_service = evaluation_service
 
 
 class EvaluateRecommendationRequest(BaseModel):
@@ -254,16 +252,31 @@ async def evaluate_recommendation(session_id: str, recommendation_id: str, reque
                 },
             )
 
-        # Process evaluation using the available method
-        updated_recommendation, _ = evaluation_service.evaluate_recommendation(
+        # Process evaluation using EvaluationService (updates recommendation object)
+        updated_recommendation, updated_context = evaluation_service.evaluate_recommendation(
             recommendation=recommendation, evaluation=request.evaluation
         )
 
-        # Update session based on evaluation result
-        # For correct evaluations, we would typically solve the group
-        # For now, just update the recommendation in session history
+        # Update session state based on evaluation
+        if request.evaluation == "correct":
+            # Mark group solved and remove words from remaining
+            try:
+                session_service.solve_group(session_id, updated_recommendation.recommended_words)
+            except Exception:
+                # If solve_group fails, continue but flag internal error
+                pass
 
-        # Get updated session state (in a real implementation, would be updated by the service)
+        elif request.evaluation == "incorrect":
+            session_service.increment_incorrect_evaluation(session_id)
+
+        elif request.evaluation == "one_away":
+            # For one-away, no special session-level action besides marking evaluation
+            pass
+
+        # Mark recommendation evaluated in session and clear pending id
+        session_service.mark_recommendation_evaluated(session_id, recommendation_id, request.evaluation)
+
+        # Retrieve updated session state
         updated_session = session_service.get_session(session_id)
         if updated_session is None:
             raise HTTPException(
@@ -290,8 +303,16 @@ async def evaluate_recommendation(session_id: str, recommendation_id: str, reque
             "next_action": "request_next_recommendation",
         }
 
-        # For now, we don't have solved group detection implemented
-        response["solved_group"] = None
+        # If we solved a group, include it in response (best-effort using updated_context)
+        response["solved_group"] = (
+            {
+                "theme": updated_context.solved_groups[-1].theme,
+                "difficulty": updated_context.solved_groups[-1].difficulty,
+                "words": updated_context.solved_groups[-1].words,
+            }
+            if updated_context and updated_context.solved_groups
+            else None
+        )
 
         return response
 

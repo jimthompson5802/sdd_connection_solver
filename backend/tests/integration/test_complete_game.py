@@ -23,5 +23,24 @@ class TestCompleteGameIntegration:
         """Test complete game from puzzle upload to session completion."""
         if client is None:
             pytest.fail("FastAPI app not implemented - integration test intentionally failing")
+        # Upload puzzle, create session, retrieve session
+        import io
 
-        assert False, "Complete game workflow integration not implemented"
+        puzzle_words = (
+            "BASS,PIANO,GUITAR,DRUMS,FISH,SALMON,TROUT,TUNA,YELLOW,GREEN,BLUE,PURPLE,APPLE,BANANA,ORANGE,GRAPE"
+        )
+        file_data = io.BytesIO(puzzle_words.encode())
+        files = {"file": ("game_test.txt", file_data, "text/plain")}
+
+        upload_response = client.post("/api/v1/puzzles/upload", files=files)
+        assert upload_response.status_code == 201
+        puzzle_id = upload_response.json()["id"]
+
+        session_response = client.post("/api/v1/sessions", json={"puzzle_id": puzzle_id, "llm_model": "gpt-4"})
+        assert session_response.status_code == 201
+        session_id = session_response.json()["id"]
+
+        get_response = client.get(f"/api/v1/sessions/{session_id}")
+        assert get_response.status_code == 200
+        session_data = get_response.json()
+        assert session_data["puzzle_id"] == puzzle_id

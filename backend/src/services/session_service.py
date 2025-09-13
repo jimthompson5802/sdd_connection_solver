@@ -102,6 +102,40 @@ class SessionService:
             return True
         return False
 
+    def mark_recommendation_evaluated(self, session_id: str, recommendation_id: str, evaluation: str) -> bool:
+        """Mark a recommendation as evaluated and update session pending state.
+
+        Args:
+            session_id: Session to update
+            recommendation_id: Recommendation ID to mark evaluated
+            evaluation: Evaluation value (correct|incorrect|one_away)
+
+        Returns:
+            True if updated, False if session or recommendation not found
+        """
+        session = self._sessions.get(session_id)
+        if not session:
+            return False
+
+        updated = False
+        for rec in session.recommendation_history:
+            if rec.id == recommendation_id:
+                rec.user_evaluation = evaluation
+                from datetime import datetime
+
+                rec.evaluation_timestamp = datetime.now()
+                updated = True
+                break
+
+        # Clear pending recommendation id if it matches
+        if session.pending_recommendation_id == recommendation_id:
+            session.pending_recommendation_id = None
+
+        if updated:
+            self.update_session_activity(session_id)
+
+        return updated
+
     def solve_group(self, session_id: str, solved_words: List[str]) -> bool:
         """Mark a group as solved and update session state.
 

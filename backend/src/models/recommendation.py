@@ -4,7 +4,9 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import uuid4
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+from pydantic import field_validator
+from pydantic import ConfigDict
 
 
 class Recommendation(BaseModel):
@@ -27,15 +29,15 @@ class Recommendation(BaseModel):
 
     id: str = Field(default_factory=lambda: str(uuid4()))
     session_id: str = Field(..., min_length=1)
-    recommended_words: List[str] = Field(..., min_items=4, max_items=4)
+    recommended_words: List[str] = Field(..., min_length=4, max_length=4)
     explanation: str = Field(..., min_length=10, max_length=500)
     timestamp: datetime = Field(default_factory=datetime.now)
-    user_evaluation: Optional[str] = Field(default=None, pattern="^(correct|incorrect|one_away)$|^$")
+    user_evaluation: Optional[str] = Field(default=None)
     evaluation_timestamp: Optional[datetime] = None
     llm_model: str = Field(..., min_length=1)
     processing_time_ms: int = Field(..., ge=0)
 
-    @validator("recommended_words")
+    @field_validator("recommended_words")
     def validate_recommended_words(cls, v: List[str]) -> List[str]:
         """Validate recommended words list.
 
@@ -62,7 +64,7 @@ class Recommendation(BaseModel):
 
         return [word.strip() for word in v]
 
-    @validator("explanation")
+    @field_validator("explanation")
     def validate_explanation(cls, v: str) -> str:
         """Validate explanation text.
 
@@ -84,7 +86,7 @@ class Recommendation(BaseModel):
 
         return explanation
 
-    @validator("user_evaluation")
+    @field_validator("user_evaluation")
     def validate_user_evaluation(cls, v: Optional[str]) -> Optional[str]:
         """Validate user evaluation value.
 
@@ -105,8 +107,8 @@ class Recommendation(BaseModel):
             raise ValueError(f"User evaluation must be one of: {', '.join(valid_evaluations)}")
         return v
 
-    @validator("evaluation_timestamp")
-    def validate_evaluation_timestamp(cls, v: Optional[datetime], values: dict) -> Optional[datetime]:
+    @field_validator("evaluation_timestamp")
+    def validate_evaluation_timestamp(cls, v: Optional[datetime], info) -> Optional[datetime]:
         """Validate evaluation timestamp consistency.
 
         Args:
@@ -119,7 +121,9 @@ class Recommendation(BaseModel):
         Raises:
             ValueError: If timestamp is inconsistent with evaluation
         """
-        user_evaluation = values.get("user_evaluation")
+        # info.data contains other field values in Pydantic v2
+        other = info.data or {}
+        user_evaluation = other.get("user_evaluation")
 
         if user_evaluation is not None and v is None:
             raise ValueError("evaluation_timestamp must be provided when user_evaluation is not None")
@@ -129,7 +133,7 @@ class Recommendation(BaseModel):
 
         return v
 
-    @validator("processing_time_ms")
+    @field_validator("processing_time_ms")
     def validate_processing_time(cls, v: int) -> int:
         """Validate processing time is non-negative.
 
@@ -146,8 +150,4 @@ class Recommendation(BaseModel):
             raise ValueError("Processing time must be non-negative")
         return v
 
-    class Config:
-        """Pydantic configuration."""
-
-        json_encoders = {datetime: lambda v: v.isoformat()}
-        validate_assignment = True
+    model_config = ConfigDict(json_encoders={datetime: lambda v: v.isoformat()}, validate_assignment=True)

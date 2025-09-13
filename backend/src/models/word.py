@@ -1,6 +1,8 @@
 """Word model for individual puzzle elements."""
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+from pydantic import field_validator
+from pydantic import ConfigDict
 
 
 class Word(BaseModel):
@@ -19,7 +21,7 @@ class Word(BaseModel):
     position: int = Field(..., ge=0, le=15)
     is_solved: bool = Field(default=False)
 
-    @validator("text")
+    @field_validator("text")
     def validate_text(cls, v: str) -> str:
         """Validate word text meets requirements.
 
@@ -46,7 +48,7 @@ class Word(BaseModel):
 
         return text
 
-    @validator("position")
+    @field_validator("position")
     def validate_position(cls, v: int) -> int:
         """Validate position is in valid range.
 
@@ -63,7 +65,4 @@ class Word(BaseModel):
             raise ValueError("Position must be between 0 and 15")
         return v
 
-    class Config:
-        """Pydantic configuration."""
-
-        validate_assignment = True
+    model_config = ConfigDict(validate_assignment=True)
