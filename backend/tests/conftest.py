@@ -145,12 +145,8 @@ def seed_puzzles_for_contract_tests():
             )
 
             # Attach a small recommendation history for sessions that need it.
-            # Leave the explicit empty-session ID without recommendations to
-            # satisfy the contract test that expects an empty history.
-            if sid == "11111111-2222-3333-4444-555555555555":
-                sess.recommendation_history = []
-                session_service._sessions[sid] = sess
-                continue
+            # Some contract tests expect specific sessions to have pre-seeded
+            # recommendations so we populate a small history for those IDs.
 
             from datetime import datetime
 
