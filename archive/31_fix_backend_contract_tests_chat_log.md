@@ -356,4 +356,5 @@ GitHub Copilot: Let me know if there's anything else I can help with!
 ---
 
 ## Note:
-* ending up making manual fixes to some tests because by using the agent to fix, the agent would undo the fix for an earlier problem to fix a later problem, causing a loop of fixes.  Using Human judgement made decision on how to do a consistent test setup.
+* Used VSCode Agent and GHCP LLM `gpt-5 mini` to make bulk of the fixes.
+* Toward the end decided to make manual fixes to some tests because by using the agent to fix, the agent would undo the fix for an earlier problem to fix a later problem, causing a loop of fixes.  Using Human judgement made decision on how to do a consistent test setup. will need to see if this occurs with the Claude Sonnet LLMs.
