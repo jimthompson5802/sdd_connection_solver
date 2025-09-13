@@ -28,6 +28,6 @@ export default defineConfig({
     cwd: __dirname,
     port: 8080,
     timeout: 180_000,
-    reuseExistingServer: true,
+  reuseExistingServer: false,
   },
 });
