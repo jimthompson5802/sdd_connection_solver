@@ -64,6 +64,7 @@ async def get_puzzle(puzzle_id: str):
         HTTPException: If puzzle is not found
     """
     try:
+        # Note: Contract tests include non-strict UUID-like identifiers; avoid forcing strict UUID parsing here.
         puzzle = puzzle_service.get_puzzle(puzzle_id)
 
         if puzzle is None:
