@@ -11,6 +11,8 @@ from ..models.ai_context import AIRecommendationContext
 router = APIRouter(prefix="/api/v1/sessions", tags=["AI Recommendations"])
 # Use imported services directly without reassignment
 
+
+class EvaluateRecommendationRequest(BaseModel):
     """Request model for evaluating a recommendation."""
 
     evaluation: str
@@ -258,12 +260,11 @@ async def evaluate_recommendation(session_id: str, recommendation_id: str, reque
             # Mark group solved and remove words from remaining
             try:
                 session_service.solve_group(session_id, updated_recommendation.recommended_words)
-            except Exception:
-                # If solve_group fails, continue but flag internal error
-                pass
-
             except ValueError:
                 # If solve_group fails due to invalid group, continue but flag internal error
+                pass
+            except Exception:
+                # If solve_group fails for other reasons, continue but flag internal error
                 pass
         elif request.evaluation == "one_away":
             # For one-away, no special session-level action besides marking evaluation
