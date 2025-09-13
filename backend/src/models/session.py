@@ -201,6 +201,8 @@ class Session(BaseModel):
         if self.pending_recommendation_id is not None:
             return False
 
+        # only pending_recommendation_id should block new requests
+
         # Can't request if too many incorrect evaluations
         if self.incorrect_evaluation_count >= 4:
             return False

@@ -96,6 +96,8 @@ class SessionService:
         session = self._sessions.get(session_id)
         if session:
             session.recommendation_history.append(recommendation)
+            # Mark as pending until evaluated
+            session.pending_recommendation_id = recommendation.id
             self.update_session_activity(session_id)
             return True
         return False

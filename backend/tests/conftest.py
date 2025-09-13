@@ -116,10 +116,15 @@ def seed_puzzles_for_contract_tests():
         from backend.src.models.session import Session as SessionCls
         from backend.src.models.recommendation import Recommendation as RecommendationCls
 
+    # TODO: look to rationalize the example IDs to reuse ids in test so that this can be cleaner
     example_session_ids = [
         "12345678-1234-5678-9abc-123456789012",
         "87654321-4321-8765-4321-876543210987",
         "11111111-2222-3333-4444-555555555555",
+        "22222222-3333-4444-5555-666666666666",
+        "33333333-4444-5555-6666-777777777777",
+        "44444444-5555-6666-7777-888888888888",
+        "55555555-6666-7777-8888-999999999999",
     ]
 
     # Create minimal sessions and add a few recommendations for history tests
@@ -156,6 +161,18 @@ def seed_puzzles_for_contract_tests():
                 recs.append(rec)
 
             sess.recommendation_history = recs
+
+            # Configure specific session states expected by contract tests
+            if sid == "87654321-4321-8765-4321-876543210987":
+                # This session should have a pending recommendation (conflict)
+                sess.pending_recommendation_id = recs[0].id
+            if sid == "11111111-2222-3333-4444-555555555555":
+                sess.status = "completed"
+            if sid == "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee":
+                sess.status = "failed"
+            if sid == "ffff1111-2222-3333-4444-555566667777":
+                sess.status = "abandoned"
+
             session_service._sessions[sid] = sess
 
     # Monkeypatch module-level session_service used by API routers
