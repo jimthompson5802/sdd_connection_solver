@@ -19,22 +19,23 @@ def seed_puzzles_for_contract_tests():
     the example IDs used by contract tests. It avoids modifying application
     code directly and centralizes test-only setup.
     """
-    # Try to create a PuzzleService from the same package namespace the app uses.
+    # Discover or create a PuzzleService instance. Prefer the package-level
+    # `puzzle_service` singleton if present; otherwise instantiate a local one.
     service = None
-    # Prefer runtime package 'src' (tests import from 'src.main'), fallback to 'backend.src'
-    tried = []
     for pkg_prefix in ("src", "backend.src"):
         try:
-            svc_mod = importlib.import_module(f"{pkg_prefix}.services.puzzle_service")
-            PuzzleService = getattr(svc_mod, "PuzzleService")
-            service = PuzzleService()
-            tried.append(pkg_prefix)
+            services_mod = importlib.import_module(f"{pkg_prefix}.services")
+            service = getattr(services_mod, "puzzle_service", None)
+            if service is None:
+                svc_mod = importlib.import_module(f"{pkg_prefix}.services.puzzle_service")
+                PuzzleService = getattr(svc_mod, "PuzzleService")
+                service = PuzzleService()
             break
         except Exception:
             continue
 
     if service is None:
-        # Last-resort: import from backend path used in some contexts
+        # Last-resort fallback to backend path
         from backend.src.services.puzzle_service import PuzzleService as PuzzleServiceFallback
 
         service = PuzzleServiceFallback()
@@ -51,14 +52,12 @@ def seed_puzzles_for_contract_tests():
         "12ab34cd-56ef-78gh-90ij-klmnopqrstuv",
     ]
 
-    # Only seed if not present
+    # Only seed puzzles if missing
     for eid in example_ids:
         if service.get_puzzle(eid) is None:
-            # Create a minimal 16-word puzzle
             words: List[str] = [f"WORD{i+1}" for i in range(16)]
 
-            # Instantiate Puzzle model from same package namespace the app uses so
-            # the Puzzle.id field matches the example ID.
+            # Prefer Puzzle model from the same package namespace the app uses
             PuzzleCls = None
             for pkg_prefix in ("src", "backend.src"):
                 try:
@@ -81,25 +80,26 @@ def seed_puzzles_for_contract_tests():
             puzzles_module = importlib.import_module(f"{pkg_prefix}.api.puzzles")
             setattr(puzzles_module, "puzzle_service", service)
         except Exception:
-            # ignore missing package variant
             pass
 
-    # Also seed SessionService with example sessions and some recommendation history
-    # so contract tests for sessions/recommendations/history pass deterministically.
+    # Seed or obtain the SessionService singleton so tests and app share state.
     session_service = None
     for pkg_prefix in ("src", "backend.src"):
         try:
-            svc_mod = importlib.import_module(f"{pkg_prefix}.services.session_service")
-            SessionService = getattr(svc_mod, "SessionService")
-            session_service = SessionService()
+            services_mod = importlib.import_module(f"{pkg_prefix}.services")
+            session_service = getattr(services_mod, "session_service", None)
+            if session_service is None:
+                svc_mod = importlib.import_module(f"{pkg_prefix}.services.session_service")
+                SessionService = getattr(svc_mod, "SessionService")
+                session_service = SessionService()
             break
         except Exception:
             continue
 
     if session_service is None:
-        from backend.src.services.session_service import SessionService as SessionServiceFallback
+        from backend.src.services import session_service as session_service_fallback
 
-        session_service = SessionServiceFallback()
+        session_service = session_service_fallback
 
     # Import Session and Recommendation model classes from same package namespace
     SessionCls = None
@@ -114,7 +114,7 @@ def seed_puzzles_for_contract_tests():
         except Exception:
             continue
 
-    if SessionCls is None:
+    if SessionCls is None or RecommendationCls is None:
         from backend.src.models.session import Session as SessionCls
         from backend.src.models.recommendation import Recommendation as RecommendationCls
 
@@ -127,6 +127,9 @@ def seed_puzzles_for_contract_tests():
         "33333333-4444-5555-6666-777777777777",
         "44444444-5555-6666-7777-888888888888",
         "55555555-6666-7777-8888-999999999999",
+        # Ensure these session IDs are present for contract history tests
+        "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "ffff1111-2222-3333-4444-555566667777",
     ]
 
     # Create minimal sessions and add a few recommendations for history tests
@@ -141,15 +144,16 @@ def seed_puzzles_for_contract_tests():
                 remaining_words=remaining_words,
             )
 
-            # Attach a small recommendation history for sessions that need it
-            recs = []
-            # Create two sample recommendations
+            # Attach a small recommendation history for sessions that need it.
+            # Leave the explicit empty-session ID without recommendations to
+            # satisfy the contract test that expects an empty history.
+            if sid == "11111111-2222-3333-4444-555555555555":
+                sess.recommendation_history = []
+                session_service._sessions[sid] = sess
+                continue
+
             from datetime import datetime
 
-            # Provide deterministic recommendation IDs for contract tests.
-            # Some contract tests expect specific recommendation IDs to exist
-            # inside particular sessions. Use a mapping to ensure those IDs
-            # are seeded into the session recommendation history.
             fixed_rec_ids = {
                 "12345678-1234-5678-9abc-123456789012": ["87654321-4321-8765-4321-876543210987"],
                 "11111111-2222-3333-4444-555555555555": ["aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"],
@@ -158,9 +162,8 @@ def seed_puzzles_for_contract_tests():
                 "44444444-5555-6666-7777-888888888888": ["55555555-6666-7777-8888-999999999999"],
             }
 
+            recs = []
             for i in range(2):
-                # Use a fixed ID when provided for this session, otherwise
-                # fall back to the previous deterministic derivation.
                 if sid in fixed_rec_ids and i < len(fixed_rec_ids[sid]):
                     rec_id = fixed_rec_ids[sid][i]
                 else:

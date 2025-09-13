@@ -2,11 +2,11 @@
 
 from fastapi import APIRouter, HTTPException
 
-from ..services.session_service import SessionService
+from ..services import session_service
+import uuid
 
 
 router = APIRouter(prefix="/api/v1/sessions", tags=["History"])
-session_service = SessionService()
 
 
 @router.get("/{session_id}/history", response_model=dict)
@@ -23,6 +23,15 @@ async def get_recommendation_history(session_id: str):
         HTTPException: If session is not found
     """
     try:
+        # Validate session_id format (contract tests expect 400 for invalid UUIDs)
+        try:
+            uuid.UUID(session_id)
+        except Exception:
+            raise HTTPException(
+                status_code=400,
+                detail={"error": "INVALID_SESSION_ID", "message": f"Session ID {session_id} is not a valid UUID"},
+            )
+
         # Get session
         session = session_service.get_session(session_id)
         if session is None:
