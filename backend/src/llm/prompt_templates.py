@@ -91,8 +91,9 @@ class PromptTemplateManager:
 
     def list_templates(self) -> List[str]:
         """Get list of available template names."""
-
-    return list(self.templates.keys())
+        """Get list of available template names."""
+        # Return the keys of the registered templates as a list
+        return list(self.templates.keys())
 
     def generate_prompt(
         self, template_name: str, ai_context: AIRecommendationContext, **extra_context
