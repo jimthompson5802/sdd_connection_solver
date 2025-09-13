@@ -13,7 +13,7 @@ puzzle_service = PuzzleService()
 
 
 @router.post("/upload", response_model=dict, status_code=201)
-async def upload_puzzle(file: UploadFile = File(...), user_id: Optional[str] = Form(None)):
+async def upload_puzzle(file: Optional[UploadFile] = File(None), user_id: Optional[str] = Form(None)):
     """Upload a text file with 16 words to create a puzzle.
 
     Args:
@@ -26,6 +26,10 @@ async def upload_puzzle(file: UploadFile = File(...), user_id: Optional[str] = F
     Raises:
         HTTPException: If file format or word count is invalid
     """
+    # If no file was provided, return a 400 error to match contract tests
+    if file is None:
+        raise HTTPException(status_code=400, detail="No file provided")
+
     try:
         # Read file content
         file_content = await file.read()
