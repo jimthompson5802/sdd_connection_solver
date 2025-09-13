@@ -199,7 +199,7 @@ class TestPuzzlesGetContract:
         if client is None:
             pytest.fail("FastAPI app not implemented - contract test intentionally failing")
 
-        test_puzzle_id = "12ab34cd-56ef-78gh-90ij-klmnopqrstuv"
+        test_puzzle_id = "12345678-1234-5678-9abc-123456789012"
 
         response = client.get(f"/api/v1/puzzles/{test_puzzle_id}")
 
