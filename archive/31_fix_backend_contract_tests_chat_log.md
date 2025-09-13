@@ -352,3 +352,8 @@ Continue to iterate?
 jimthompson5802: @agent Pause: "Continue to iterate?"
 
 GitHub Copilot: Let me know if there's anything else I can help with!
+
+---
+
+## Note:
+* ending up making manual fixes to some tests because by using the agent to fix, the agent would undo the fix for an earlier problem to fix a later problem, causing a loop of fixes.  Using Human judgement made decision on how to do a consistent test setup.
