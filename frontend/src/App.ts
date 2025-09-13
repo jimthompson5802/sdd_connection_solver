@@ -133,6 +133,11 @@ export class App {
       this.setState({ phase: 'upload', isLoading: false });
       
       this.log('Application initialized successfully');
+      // Mark the app as ready for E2E tests to wait on
+      const appRoot = document.getElementById('app');
+      if (appRoot) {
+        appRoot.setAttribute('data-app-ready', 'true');
+      }
       
     } catch (error) {
       this.handleError('Failed to initialize application', error);
@@ -411,7 +416,7 @@ export class App {
         return `
           <div class="upload-section">
             <h2>Upload Puzzle</h2>
-            <div id="file-upload"></div>
+            <div id="file-upload" class="upload-component file-upload"></div>
           </div>
         `;
       
@@ -422,7 +427,7 @@ export class App {
             <div id="puzzle-view"></div>
             <div id="recommendation-area">
               <div id="recommendation-card"></div>
-              <div id="evaluation-buttons"></div>
+              <div id="evaluation-buttons" class="evaluation-buttons"></div>
             </div>
             <div id="history-view"></div>
           </div>
@@ -570,6 +575,10 @@ export class App {
     this.gameState.reset();
     this.eventHandlers.clear();
     this.components.clear();
+    const appRoot = document.getElementById('app');
+    if (appRoot) {
+      appRoot.removeAttribute('data-app-ready');
+    }
   }
 }
 
