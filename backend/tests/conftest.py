@@ -144,8 +144,25 @@ def seed_puzzles_for_contract_tests():
             # Create two sample recommendations
             from datetime import datetime
 
+            # Provide deterministic recommendation IDs for contract tests.
+            # Some contract tests expect specific recommendation IDs to exist
+            # inside particular sessions. Use a mapping to ensure those IDs
+            # are seeded into the session recommendation history.
+            fixed_rec_ids = {
+                "12345678-1234-5678-9abc-123456789012": ["87654321-4321-8765-4321-876543210987"],
+                "11111111-2222-3333-4444-555555555555": ["aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"],
+                "22222222-3333-4444-5555-666666666666": ["ffff1111-2222-3333-4444-555566667777"],
+                "33333333-4444-5555-6666-777777777777": ["12ab34cd-56ef-78gh-90ij-klmnopqrstuv"],
+                "44444444-5555-6666-7777-888888888888": ["55555555-6666-7777-8888-999999999999"],
+            }
+
             for i in range(2):
-                rec_id = f"{sid[:-2]}{i:02d}"
+                # Use a fixed ID when provided for this session, otherwise
+                # fall back to the previous deterministic derivation.
+                if sid in fixed_rec_ids and i < len(fixed_rec_ids[sid]):
+                    rec_id = fixed_rec_ids[sid][i]
+                else:
+                    rec_id = f"{sid[:-2]}{i:02d}"
                 recommended_words = [f"W{i}{j}" for j in range(4)]
                 rec = RecommendationCls(
                     id=rec_id,

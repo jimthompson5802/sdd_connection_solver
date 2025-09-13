@@ -1,6 +1,7 @@
 """FastAPI endpoints for AI recommendation operations."""
 
 from fastapi import APIRouter, HTTPException
+from uuid import UUID
 from pydantic import BaseModel
 
 from ..services.session_service import SessionService
@@ -182,6 +183,26 @@ async def evaluate_recommendation(session_id: str, recommendation_id: str, reque
         HTTPException: If recommendation not found or evaluation is invalid
     """
     try:
+        # Validate UUID formats for session and recommendation — return 400 for malformed UUIDs
+        try:
+            UUID(session_id)
+        except Exception:
+            raise HTTPException(
+                status_code=400,
+                detail={"error": "INVALID_SESSION_UUID", "message": f"Session ID {session_id} is not a valid UUID"},
+            )
+
+        try:
+            UUID(recommendation_id)
+        except Exception:
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "error": "INVALID_RECOMMENDATION_UUID",
+                    "message": f"Recommendation ID {recommendation_id} is not a valid UUID",
+                },
+            )
+
         # Validate evaluation
         valid_evaluations = ["correct", "incorrect", "one_away"]
         if request.evaluation not in valid_evaluations:

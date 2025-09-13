@@ -111,8 +111,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     """
     logger.warning(f"Validation error on {request.url}: {exc}")
 
+    # Contract tests expect validation failures (missing fields or malformed JSON)
+    # to return HTTP 400 rather than 422. Return a structured error payload with
+    # details for debugging while using status code 400 to satisfy tests.
     return JSONResponse(
-        status_code=422,
+        status_code=400,
         content={
             "error": "VALIDATION_ERROR",
             "message": "Request validation failed",
