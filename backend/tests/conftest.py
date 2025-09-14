@@ -130,6 +130,7 @@ def seed_puzzles_for_contract_tests():
         # Ensure these session IDs are present for contract history tests
         "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
         "ffff1111-2222-3333-4444-555566667777",
+        "12ab34cd-56ef-78gh-90ij-klmnopqrstuv",
     ]
 
     # Create minimal sessions and add a few recommendations for history tests
@@ -190,6 +191,9 @@ def seed_puzzles_for_contract_tests():
                 sess.status = "failed"
             if sid == "ffff1111-2222-3333-4444-555566667777":
                 sess.status = "abandoned"
+            if sid == "12ab34cd-56ef-78gh-90ij-klmnopqrstuv":
+                sess.status = "failed"
+                sess.incorrect_evaluation_count = 4
 
             session_service._sessions[sid] = sess
 
