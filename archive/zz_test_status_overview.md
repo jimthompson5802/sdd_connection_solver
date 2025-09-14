@@ -123,8 +123,8 @@ Diagnostic run complete
 ## Backend Test Status Overview
 ```shell
 source /Users/jim/Desktop/genai/sdd_connection_solver/venv/bin/activate
-Mac:jim sdd_connection_solver[497]$ source /Users/jim/Desktop/genai/sdd_connection_solver/venv/bin/activate
-((venv) ) Mac:jim sdd_connection_solver[498]$ pytest -q backend/tests
+Mac:jim sdd_connection_solver[487]$ source /Users/jim/Desktop/genai/sdd_connection_solver/venv/bin/activate
+((venv) ) Mac:jim sdd_connection_solver[488]$ pytest -q backend/tests
 ================================================================== test session starts ===================================================================
 platform darwin -- Python 3.12.11, pytest-8.4.2, pluggy-1.6.0
 rootdir: /Users/jim/Desktop/genai/sdd_connection_solver/backend
@@ -133,66 +133,38 @@ plugins: asyncio-1.1.0, mock-3.15.0, anyio-4.10.0, langsmith-0.4.27
 asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
 collected 215 items                                                                                                                                      
 
-backend/tests/contract/test_history.py ..F.FFF..                                                                                                   [  4%]
+backend/tests/contract/test_history.py ..F......                                                                                                   [  4%]
 backend/tests/contract/test_puzzles_get.py .........                                                                                               [  8%]
 backend/tests/contract/test_puzzles_upload.py ..........                                                                                           [ 13%]
 backend/tests/contract/test_recommendations_create.py ...........                                                                                  [ 18%]
 backend/tests/contract/test_recommendations_evaluate.py ............                                                                               [ 23%]
 backend/tests/contract/test_recommendations_get.py ...........                                                                                     [ 28%]
 backend/tests/contract/test_sessions_create.py ...........                                                                                         [ 33%]
-backend/tests/contract/test_sessions_get.py ...FFF......                                                                                           [ 39%]
-backend/tests/integration/test_ai_recommendations.py FF                                                                                            [ 40%]
-backend/tests/integration/test_complete_game.py F                                                                                                  [ 40%]
-backend/tests/integration/test_evaluation_flow.py F                                                                                                [ 41%]
-backend/tests/integration/test_puzzle_upload_flow.py ...F.                                                                                         [ 43%]
+backend/tests/contract/test_sessions_get.py ............                                                                                           [ 39%]
+backend/tests/integration/test_ai_recommendations.py ..                                                                                            [ 40%]
+backend/tests/integration/test_complete_game.py .                                                                                                  [ 40%]
+backend/tests/integration/test_evaluation_flow.py .                                                                                                [ 41%]
+backend/tests/integration/test_puzzle_upload_flow.py .....                                                                                         [ 43%]
 backend/tests/integration/test_session_creation.py ...                                                                                             [ 45%]
 backend/tests/performance/test_api_response_times.py .FF.FF.........EEE                                                                            [ 53%]
-backend/tests/performance/test_recommendation_timing.py ..........F                                                                                [ 58%]
+backend/tests/performance/test_recommendation_timing.py ...........                                                                                [ 58%]
 backend/tests/performance/test_websocket_capacity.py ..........                                                                                    [ 63%]
 backend/tests/unit/test_context_service.py ............................                                                                            [ 76%]
-backend/tests/unit/test_evaluation_logic.py ...F......F.......F.                                                                                   [ 85%]
-backend/tests/unit/test_prompt_generation.py ..........FFFFFFFF.F...FFFF..FF                                                                       [100%]
+backend/tests/unit/test_evaluation_logic.py ..........F.........                                                                                   [ 85%]
+backend/tests/unit/test_prompt_generation.py .............................F.                                                                       [100%]
 
 ================================================================ short test summary info =================================================================
 FAILED backend/tests/contract/test_history.py::TestHistoryContract::test_get_history_empty_session - AssertionError: assert 2 == 0
-FAILED backend/tests/contract/test_history.py::TestHistoryContract::test_get_history_invalid_session_uuid - AssertionError: Expected 400, got 404
-FAILED backend/tests/contract/test_history.py::TestHistoryContract::test_get_history_summary_calculations - assert 404 == 200
-FAILED backend/tests/contract/test_history.py::TestHistoryContract::test_get_history_recommendation_uniqueness - assert 404 == 200
-FAILED backend/tests/contract/test_sessions_get.py::TestSessionsGetContract::test_get_session_active_status - assert 404 == 200
-FAILED backend/tests/contract/test_sessions_get.py::TestSessionsGetContract::test_get_session_completed_status - assert 404 == 200
-FAILED backend/tests/contract/test_sessions_get.py::TestSessionsGetContract::test_get_session_failed_status - assert 400 == 200
-FAILED backend/tests/integration/test_ai_recommendations.py::TestAIRecommendationsIntegration::test_complete_recommendation_workflow - AssertionError: AI recommendation integration not implemented
-FAILED backend/tests/integration/test_ai_recommendations.py::TestAIRecommendationsIntegration::test_context_aware_recommendations - AssertionError: Context-aware recommendation logic not implemented
-FAILED backend/tests/integration/test_complete_game.py::TestCompleteGameIntegration::test_complete_game_session_workflow - AssertionError: Complete game workflow integration not implemented
-FAILED backend/tests/integration/test_evaluation_flow.py::TestEvaluationFlowIntegration::test_complete_evaluation_workflow - AssertionError: Evaluation workflow integration not implemented
-FAILED backend/tests/integration/test_puzzle_upload_flow.py::TestPuzzleUploadFlowIntegration::test_puzzle_upload_duplicate_detection - assert 'duplicate' in '{\'error\': \'validation_error\', \'message\': "1 validation error for puzzle\\nwords\\n  value error, all words must...\', \'...
 FAILED backend/tests/performance/test_api_response_times.py::TestAPIResponseTimes::test_puzzle_get_response_time - assert 400 == 200
 FAILED backend/tests/performance/test_api_response_times.py::TestAPIResponseTimes::test_session_create_response_time - assert 400 == 201
 FAILED backend/tests/performance/test_api_response_times.py::TestAPIResponseTimes::test_history_get_response_time - pydantic_core._pydantic_core.ValidationError: 1 validation error for Session
 FAILED backend/tests/performance/test_api_response_times.py::TestAPIResponseTimes::test_recommendations_get_response_time - pydantic_core._pydantic_core.ValidationError: 1 validation error for Session
-FAILED backend/tests/performance/test_recommendation_timing.py::TestPerformanceEdgeCases::test_maximum_context_timing - pydantic_core._pydantic_core.ValidationError: 2 validation errors for AIRecommendationContext
-FAILED backend/tests/unit/test_evaluation_logic.py::TestEvaluationService::test_evaluate_recommendation_one_away - pydantic_core._pydantic_core.ValidationError: 2 validation errors for OneAwayGroup
 FAILED backend/tests/unit/test_evaluation_logic.py::TestEvaluationService::test_analyze_learning_patterns_improvement - assert False
-FAILED backend/tests/unit/test_evaluation_logic.py::TestEvaluationService::test_evaluation_with_existing_solved_groups - AttributeError: 'Group' object has no attribute 'position'
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptTemplateManager::test_generate_prompt_success - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptTemplateManager::test_generate_prompt_template_not_found - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptTemplateManager::test_select_template_initial - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptTemplateManager::test_select_template_context_aware - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptTemplateManager::test_select_template_one_away_focused - pydantic_core._pydantic_core.ValidationError: 2 validation errors for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptTemplateManager::test_select_template_final_attempt - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptTemplateManager::test_build_context_variables_minimal - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptTemplateManager::test_build_context_variables_full - pydantic_core._pydantic_core.ValidationError: 2 validation errors for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptTemplateManager::test_format_solved_groups_multiple - pydantic_core._pydantic_core.ValidationError: 1 validation error for Group
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptTemplateManager::test_format_one_away_attempts_multiple - AttributeError: 'OneAwayGroup' object has no attribute 'attempted_words'
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptGeneration::test_get_prompt_for_context_auto_select - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptGeneration::test_get_prompt_for_context_specific_template - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptGeneration::test_get_prompt_for_context_extra_context - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptGeneration::test_template_variable_consistency - pydantic_core._pydantic_core.ValidationError: 2 validation errors for AIRecommendationContext
-FAILED backend/tests/unit/test_prompt_generation.py::TestPromptGeneration::test_template_context_sensitivity - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIRecommendationContext
+FAILED backend/tests/unit/test_prompt_generation.py::TestPromptGeneration::test_template_variable_consistency - Failed: Template custom_with_extra failed to render: Missing required variables: {'extra_var'}
 ERROR backend/tests/performance/test_api_response_times.py::TestMemoryEfficiency::test_path_parameter_processing
 ERROR backend/tests/performance/test_api_response_times.py::TestMemoryEfficiency::test_query_parameter_processing
 ERROR backend/tests/performance/test_api_response_times.py::TestMemoryEfficiency::test_json_payload_processing
-================================================= 35 failed, 177 passed, 96 warnings, 3 errors in 8.15s ==================================================
-((venv) ) Mac:jim sdd_connection_solver[499]$ 
+================================================== 7 failed, 205 passed, 16 warnings, 3 errors in 8.70s ==================================================
+((venv) ) Mac:jim sdd_connection_solver[489]$ 
 ```
 
