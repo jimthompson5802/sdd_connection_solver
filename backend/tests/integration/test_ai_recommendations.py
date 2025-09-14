@@ -1,16 +1,14 @@
-"""
-Integration test for AI recommendation generation with context.
+"""Integration test for AI recommendation generation with context.
 
 This test validates the end-to-end AI recommendation functionality.
 These tests MUST FAIL until the actual implementation is complete.
 """
 
+import io
 import pytest
 from fastapi.testclient import TestClient
-import io
 
 try:
-    from src.main import app
     from src.main import app
 
     client = TestClient(app)
@@ -25,9 +23,11 @@ class TestAIRecommendationsIntegration:
         """Test complete recommendation generation and evaluation workflow."""
         if client is None:
             pytest.fail("FastAPI app not implemented - integration test intentionally failing")
+
         puzzle_words = (
             "BASS,PIANO,GUITAR,DRUMS,FISH,SALMON,TROUT,TUNA,YELLOW,GREEN,BLUE,PURPLE,APPLE,BANANA,ORANGE,GRAPE"
         )
+        file_data = io.BytesIO(puzzle_words.encode())
         files = {"file": ("test_puzzle.txt", file_data, "text/plain")}
         data = {"user_id": "integration-test-user"}
 
@@ -67,11 +67,13 @@ class TestAIRecommendationsIntegration:
         """Test that recommendations consider previous evaluations."""
         if client is None:
             pytest.fail("FastAPI app not implemented - integration test intentionally failing")
+
         # We'll perform a short flow and ensure recommendations can be generated
-        puzzle_words = "A1,B2,C3,D4,E5,F6,G7,H8,I9,J10,K11,L12,M13,N14,O15,P16"
         puzzle_words = "A1,B2,C3,D4,E5,F6,G7,H8,I9,J10,K11,L12,M13,N14,O15,P16"
         file_data = io.BytesIO(puzzle_words.encode())
         files = {"file": ("puzzle.csv", file_data, "text/csv")}
+        upload_response = client.post("/api/v1/puzzles/upload", files=files, data={"user_id": "integration-test-user"})
+        assert upload_response.status_code == 201
         puzzle_id = upload_response.json()["id"]
 
         session_request = {"puzzle_id": puzzle_id, "llm_model": "gpt-4"}
@@ -93,4 +95,6 @@ class TestAIRecommendationsIntegration:
         # Generate another recommendation and ensure it returns a fresh recommendation
         rec2_response = client.post(f"/api/v1/sessions/{session_id}/recommendations")
         assert rec2_response.status_code == 201
-        assert rec2_response.json()["user_evaluation"] is None or "id" in rec2_response.json()
+        rec2_data = rec2_response.json()
+        assert "id" in rec2_data
+        assert rec2_data.get("user_evaluation") is None
