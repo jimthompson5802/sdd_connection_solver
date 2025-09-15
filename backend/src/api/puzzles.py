@@ -5,11 +5,10 @@ from typing import Optional
 
 from uuid import UUID
 
-from ..services.puzzle_service import PuzzleService
+from ..services import puzzle_service
 
 
 router = APIRouter(prefix="/api/v1/puzzles", tags=["Puzzles"])
-puzzle_service = PuzzleService()
 
 
 @router.post("/upload", response_model=dict, status_code=201)
