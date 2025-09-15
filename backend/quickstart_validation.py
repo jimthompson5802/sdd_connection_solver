@@ -86,7 +86,7 @@ def test_quickstart_scenarios(base_url="http://localhost:8000"):
             with open(puzzle_file, "rb") as f:
                 files = {"file": f}
                 data = {"user_id": "quickstart-test-user"}
-                response = requests.post(f"{base_url}/api/v1/puzzles/upload", files=files, data=data, timeout=10)
+                response = requests.post(f"{base_url}/api/v1/puzzles/upload", files=files, data=data)  # , timeout=10)
 
             if response.status_code == 201:
                 puzzle_data = response.json()
@@ -100,7 +100,12 @@ def test_quickstart_scenarios(base_url="http://localhost:8000"):
                 print("\n🎮 Testing Session Creation...")
                 session_data = {"puzzle_id": puzzle_id, "llm_model": "gpt-4", "user_id": "quickstart-test-user"}
 
-                response = requests.post(f"{base_url}/api/v1/sessions", json=session_data, timeout=10)
+                response = requests.post(
+                    f"{base_url}/api/v1/sessions",
+                    json=session_data,
+                    # timeout=10,
+                    # headers={"Content-Type": "application/json"},
+                )
 
                 if response.status_code == 201:
                     session_info = response.json()
