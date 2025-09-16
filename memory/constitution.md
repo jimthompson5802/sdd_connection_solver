@@ -1,50 +1,40 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+## NYT Connections Puzzle Assistant - Project Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Library-First, Service-Oriented
+All functionality should be organized as small, well-scoped modules or services. The backend exposes clear service boundaries (puzzle service, session service, LLM service, evaluation service) and models; the frontend is a discrete TypeScript application that communicates via HTTP and WebSocket. Each module must be independently testable and documented.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. API Contracts & Observability
+APIs are first-class: routers in `backend/src/api` define explicit JSON contracts and error shapes used by tests. Handlers must return structured error payloads (see `RequestValidationError` -> `VALIDATION_ERROR`) and use consistent status codes to satisfy integration tests. Logging is required for all request/response flows (see `main.py` logging and middleware).
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Test-First and Contract Tests
+Automated tests are required. The repo contains unit and integration-style tests that rely on deterministic behavior (seeded sessions, mock LLM responses). New features must include tests that assert API contracts and service behavior. Maintain compatibility with existing contract tests.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Simplicity and In-Memory Defaults
+Start simple: services default to in-memory stores (see `PuzzleService`, `SessionService`) and mocked LLM responses for development. Production integrations (persistent storage, real LLM APIs) should be added behind configuration flags and documented migration steps.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Security & Validation
+Input validation is enforced at model and router boundaries (Pydantic validators in `models/`). Reject invalid data early with clear, machine-readable errors. CORS and Trusted Host middleware must be configured for allowed origins and hosts.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Technology & Architecture Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- **Backend**: Python 3.12+, FastAPI, Pydantic v2, Uvicorn. Services organized under `backend/src/services`, API routers under `backend/src/api`, models under `backend/src/models`.
+- **Frontend**: TypeScript, Webpack, Playwright for E2E tests. Frontend builds to `dist/` and communicates via REST and WebSocket endpoints (`/api/v1/...`, `/ws/sessions/{session_id}/recommendations`).
+- **Testing**: `pytest` for backend, `jest`/`playwright` for frontend. CI must run contract tests that assert API behavior.
+- **LLM Integration**: Abstracted behind `LLMService`; mock mode enabled by default for development. Real provider integrations (OpenAI, Anthropic, etc.) must be pluggable and optionally configured via environment variables.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Development Workflow & Quality Gates
+
+- **Formatting & Linting**: Use `black`, `isort`, `flake8` for Python; `eslint` and `prettier` for frontend. Keep line length ≤ 120 for Python.
+- **Type Safety**: Pydantic models for backend; TypeScript strict mode for frontend. Include type annotations on all new Python functions.
+- **CI Gates**: PRs must pass unit tests and contract tests, and must not break API shapes used by consumers. New endpoints require OpenAPI docs updates where applicable.
+- **Seeded Determinism**: Keep deterministic seeds used by contract tests (see seeded session IDs in `main.py`) to avoid breaking test expectations.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- Amendments to this constitution require a short rationale, a migration plan for affected tests, and a code change with updated tests.
+- Breaking changes to API contracts require a major-version bump and explicit migration notes in `CHANGELOG.md`.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2025-09-15 | **Last Amended**: 2025-09-15
