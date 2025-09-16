@@ -259,6 +259,338 @@ body {
 .text-danger { color: var(--color-danger); }
 .text-info { color: var(--color-info); }
 
+/* === Puzzle Interface Layout === */
+.puzzle-interface {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  background-color: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Puzzle File Section */
+.puzzle-file-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.puzzle-file-section label {
+  font-weight: 600;
+  min-width: 100px;
+}
+
+.puzzle-file-section input[type="file"] {
+  flex: 1;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-background);
+}
+
+.setup-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.setup-button:hover {
+  background-color: var(--color-secondary);
+}
+
+/* Remaining Words Section */
+.remaining-words-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.remaining-words-section label {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.remaining-words-box {
+  min-height: 120px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-background);
+  resize: none;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+
+/* Recommendation Control Section */
+.recommendation-control-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-sm);
+}
+
+.recommendation-button {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: var(--color-success);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.recommendation-button:hover {
+  background-color: #4CAF50;
+}
+
+.counters {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+  font-weight: 500;
+}
+
+.counter-input {
+  width: 50px;
+  padding: var(--spacing-xs);
+  text-align: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-surface);
+}
+
+/* Recommended Group Section */
+.recommended-group-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.recommended-group-section label {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.recommended-group-box {
+  min-height: 80px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-background);
+  resize: none;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+}
+
+/* Connection Reason Section */
+.connection-reason-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.connection-reason-section label {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.connection-reason-box {
+  min-height: 80px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-background);
+  resize: none;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+}
+
+/* Status Control Section */
+.status-control-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-sm);
+}
+
+.status-input {
+  flex: 1;
+  max-width: 300px;
+  padding: var(--spacing-sm);
+  margin-left: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-surface);
+}
+
+.terminate-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--color-danger);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.terminate-button:hover {
+  background-color: #c9302c;
+}
+
+/* Recommender Section */
+.recommender-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.recommender-section label {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.recommender-box {
+  min-height: 80px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-background);
+  resize: none;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+}
+
+/* Group Color Section */
+.group-color-section {
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-sm);
+}
+
+.group-color-section > span {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
+.color-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.color-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 2px solid transparent;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.yellow-btn {
+  background-color: var(--color-group-easy);
+  color: var(--color-text);
+}
+
+.green-btn {
+  background-color: var(--color-group-medium);
+  color: white;
+}
+
+.blue-btn {
+  background-color: var(--color-group-hard);
+  color: white;
+}
+
+.purple-btn {
+  background-color: var(--color-group-tricky);
+  color: white;
+}
+
+.color-btn:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.color-btn.selected {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Puzzle Response Section */
+.puzzle-response-section {
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-sm);
+}
+
+.puzzle-response-section > span {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
+.response-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.response-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.response-btn:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-background);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.response-btn.selected {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  box-shadow: var(--shadow-lg);
+}
+
+.one-away-btn.selected {
+  background-color: var(--color-warning);
+  border-color: var(--color-warning);
+}
+
+.not-correct-btn.selected {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
 /* === Responsive Design === */
 @media (max-width: 768px) {
   .header-content {
@@ -278,6 +610,38 @@ body {
   .welcome-message {
     font-size: var(--font-size-lg);
   }
+
+  /* Puzzle Interface Responsive */
+  .puzzle-interface {
+    padding: var(--spacing-md);
+  }
+
+  .puzzle-file-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+
+  .recommendation-control-section {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: stretch;
+  }
+
+  .counters {
+    justify-content: center;
+  }
+
+  .status-control-section {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: stretch;
+  }
+
+  .color-buttons,
+  .response-buttons {
+    justify-content: center;
+  }
 }
 
 @media (max-width: 480px) {
@@ -291,6 +655,22 @@ body {
   
   .placeholder-content {
     padding: var(--spacing-lg);
+  }
+
+  /* Small screen adjustments */
+  .puzzle-interface {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-md);
+  }
+
+  .color-buttons,
+  .response-buttons {
+    flex-direction: column;
+  }
+
+  .color-btn,
+  .response-btn {
+    text-align: center;
   }
 }
 

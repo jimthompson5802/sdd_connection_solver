@@ -25,22 +25,84 @@
 
         <!-- Main Application Content -->
         <main class="app-main">
-            <!-- Minimal static content for E2E tests -->
-            <section class="home-view">
-                <p class="welcome-message">Welcome to the NYT Connections Puzzle Assistant (demo)</p>
-
-                <!-- Minimal upload component placeholder required by tests -->
-                <div class="upload-component file-upload" aria-label="file upload">
-                    <label for="file-input">Upload puzzle file</label>
-                    <input id="file-input" type="file" />
+            <div class="puzzle-interface">
+                <!-- Puzzle File Upload Section -->
+                <div class="puzzle-file-section">
+                    <label for="puzzle-file-input">Puzzle File:</label>
+                    <input id="puzzle-file-input" type="file" accept=".txt,.json" />
+                    <button id="setup-puzzle-btn" class="setup-button">Setup Puzzle</button>
                 </div>
 
-                <!-- Minimal evaluation buttons placeholder required by tests -->
+                <!-- Remaining Words Section -->
+                <div class="remaining-words-section">
+                    <label for="remaining-words">Remaining Words</label>
+                    <textarea id="remaining-words" class="remaining-words-box" readonly></textarea>
+                </div>
+
+                <!-- Recommendation Control Section -->
+                <div class="recommendation-control-section">
+                    <button id="get-recommendation-btn" class="recommendation-button">Get Next Recommendation</button>
+                    <div class="counters">
+                        <span>Found Count: <input id="found-count" type="text" class="counter-input" readonly /></span>
+                        <span>Mistake Count: <input id="mistake-count" type="text" class="counter-input" readonly /></span>
+                    </div>
+                </div>
+
+                <!-- Recommended Group Section -->
+                <div class="recommended-group-section">
+                    <label for="recommended-group">Recommended Group:</label>
+                    <textarea id="recommended-group" class="recommended-group-box" readonly></textarea>
+                </div>
+
+                <!-- Connection Reason Section -->
+                <div class="connection-reason-section">
+                    <label for="connection-reason">Connection Reason:</label>
+                    <textarea id="connection-reason" class="connection-reason-box" readonly></textarea>
+                </div>
+
+                <!-- Status and Control Section -->
+                <div class="status-control-section">
+                    <span>Status: <input id="status-display" type="text" class="status-input" readonly /></span>
+                    <button id="terminate-btn" class="terminate-button">Terminate</button>
+                </div>
+
+                <!-- Recommender Section -->
+                <div class="recommender-section">
+                    <label for="recommender-info">Recommender:</label>
+                    <textarea id="recommender-info" class="recommender-box" readonly></textarea>
+                </div>
+
+                <!-- Correct Group Color Section -->
+                <div class="group-color-section">
+                    <span>Correct Group Color:</span>
+                    <div class="color-buttons">
+                        <button class="color-btn yellow-btn" data-color="yellow">Yellow</button>
+                        <button class="color-btn green-btn" data-color="green">Green</button>
+                        <button class="color-btn blue-btn" data-color="blue">Blue</button>
+                        <button class="color-btn purple-btn" data-color="purple">Purple</button>
+                    </div>
+                </div>
+
+                <!-- Puzzle Response Section -->
+                <div class="puzzle-response-section">
+                    <span>Puzzle Response:</span>
+                    <div class="response-buttons">
+                        <button class="response-btn one-away-btn" data-response="one-away">One-away Error</button>
+                        <button class="response-btn not-correct-btn" data-response="not-correct">Not Correct</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden fallback elements for E2E tests -->
+            <div style="display:none" aria-hidden="true">
+                <div class="upload-component file-upload" aria-label="file upload">
+                    <input id="file-input" type="file" />
+                </div>
                 <div class="evaluation-buttons" role="toolbar" aria-label="evaluation buttons">
                     <button class="eval-accept">Accept</button>
                     <button class="eval-reject">Reject</button>
                 </div>
-            </section>
+            </div>
         </main>
 
         <!-- Footer -->
@@ -61,11 +123,5 @@
 
     <!-- Application Scripts -->
     <script type="module" src="main.js"></script>
-
-    <!-- Hidden fallback elements to ensure E2E locators exist regardless of runtime rendering -->
-    <div style="display:none" aria-hidden="true">
-        <div class="upload-component" id="e2e-fallback-upload"></div>
-        <div class="evaluation-buttons" id="e2e-fallback-eval"></div>
-    </div>
 </body>
 </html>

@@ -126,7 +126,7 @@ export class App {
       // Initialize components
       await this.initializeComponents();
       
-      // Setup global event handlers
+      // Setup global event handlers (includes UI handlers)
       this.setupGlobalHandlers();
       
       // Mark as ready
@@ -358,6 +358,123 @@ export class App {
         }
       }
     });
+
+    // Setup UI event handlers for new layout
+    this.setupUIEventHandlers();
+  }
+
+  /**
+   * Setup event handlers for UI elements
+   */
+  private setupUIEventHandlers(): void {
+    // Setup puzzle file input handler
+    const setupButton = document.getElementById('setup-puzzle-btn') as HTMLButtonElement;
+    if (setupButton) {
+      setupButton.addEventListener('click', () => {
+        const fileInput = document.getElementById('puzzle-file-input') as HTMLInputElement;
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+          this.handleFileUpload(fileInput.files[0]);
+        }
+      });
+    }
+
+    // Setup recommendation button handler
+    const getRecommendationBtn = document.getElementById('get-recommendation-btn') as HTMLButtonElement;
+    if (getRecommendationBtn) {
+      getRecommendationBtn.addEventListener('click', () => {
+        this.requestRecommendation();
+      });
+    }
+
+    // Setup terminate button handler
+    const terminateBtn = document.getElementById('terminate-btn') as HTMLButtonElement;
+    if (terminateBtn) {
+      terminateBtn.addEventListener('click', () => {
+        this.endSession();
+      });
+    }
+
+    // Setup color buttons handlers
+    const colorButtons = document.querySelectorAll('.color-btn');
+    colorButtons.forEach(button => {
+      button.addEventListener('click', (event) => {
+        const target = event.target as HTMLButtonElement;
+        const color = target.getAttribute('data-color');
+        this.selectGroupColor(color);
+      });
+    });
+
+    // Setup response buttons handlers
+    const responseButtons = document.querySelectorAll('.response-btn');
+    responseButtons.forEach(button => {
+      button.addEventListener('click', (event) => {
+        const target = event.target as HTMLButtonElement;
+        const response = target.getAttribute('data-response');
+        this.selectPuzzleResponse(response);
+      });
+    });
+  }
+
+  /**
+   * Handle group color selection
+   */
+  private selectGroupColor(color: string | null): void {
+    // Remove previous selection
+    document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
+    
+    // Add selection to clicked button
+    if (color) {
+      const button = document.querySelector(`[data-color="${color}"]`);
+      if (button) {
+        button.classList.add('selected');
+      }
+    }
+    
+    this.log('Group color selected:', color);
+  }
+
+  /**
+   * Handle puzzle response selection
+   */
+  private selectPuzzleResponse(response: string | null): void {
+    // Remove previous selection
+    document.querySelectorAll('.response-btn').forEach(btn => btn.classList.remove('selected'));
+    
+    // Add selection to clicked button
+    if (response) {
+      const button = document.querySelector(`[data-response="${response}"]`);
+      if (button) {
+        button.classList.add('selected');
+      }
+      
+      // Process the response
+      this.processPuzzleResponse(response);
+    }
+    
+    this.log('Puzzle response selected:', response);
+  }
+
+  /**
+   * Process puzzle response (evaluation)
+   */
+  private async processPuzzleResponse(response: string): Promise<void> {
+    const gameState = this.gameState.getState();
+    if (gameState.session?.pendingRecommendationId) {
+      let evaluation: 'correct' | 'incorrect' | 'one_away';
+      
+      switch (response) {
+        case 'one-away':
+          evaluation = 'one_away';
+          break;
+        case 'not-correct':
+          evaluation = 'incorrect';
+          break;
+        default:
+          return;
+      }
+      
+      await this.evaluateRecommendation(gameState.session.pendingRecommendationId, evaluation);
+    }
   }
 
   /**
@@ -382,66 +499,118 @@ export class App {
    * Render the main UI structure
    */
   private renderUI(): void {
-    this.container.innerHTML = `
-      <div class="app-container">
-        <header class="app-header">
-          <h1>NYT Connections Puzzle Assistant</h1>
-          <div class="connection-status" id="connection-status">
-            ${this.state.isConnected ? '🟢 Connected' : '🔴 Disconnected'}
-          </div>
-        </header>
-        
-        <main class="app-main" id="app-main">
-          ${this.renderMainContent()}
-        </main>
-        
-        <footer class="app-footer">
-          <div class="debug-info" id="debug-info" style="display: ${this.config.debugMode ? 'block' : 'none'}">
-            Phase: ${this.state.phase} | Session: ${this.state.currentSessionId || 'None'}
-          </div>
-        </footer>
-      </div>
-    `;
+    // Since HTML structure is now static in index.html, 
+    // we just need to set up initial UI state
+    this.initializeUIElements();
   }
 
   /**
-   * Render main content based on current phase
+   * Initialize UI elements with default values
    */
-  private renderMainContent(): string {
-    switch (this.state.phase) {
-      case 'loading':
-        return '<div class="loading">Loading...</div>';
-      
-      case 'upload':
-        return `
-          <div class="upload-section">
-            <h2>Upload Puzzle</h2>
-            <div id="file-upload" class="upload-component file-upload"></div>
-          </div>
-        `;
-      
-      case 'session':
-        return `
-          <div class="session-section">
-            <div id="session-status"></div>
-            <div id="puzzle-view"></div>
-            <div id="recommendation-area">
-              <div id="recommendation-card"></div>
-              <div id="evaluation-buttons" class="evaluation-buttons"></div>
-            </div>
-            <div id="history-view"></div>
-          </div>
-        `;
-      
-      case 'completed':
-        return '<div class="completed">Puzzle completed! 🎉</div>';
-      
-      case 'error':
-        return `<div class="error">Error: ${this.state.errorMessage}</div>`;
-      
-      default:
-        return '<div class="unknown-state">Unknown state</div>';
+  private initializeUIElements(): void {
+    // Set initial values for UI elements
+    const foundCountInput = document.getElementById('found-count') as HTMLInputElement;
+    if (foundCountInput) foundCountInput.value = '0';
+
+    const mistakeCountInput = document.getElementById('mistake-count') as HTMLInputElement;
+    if (mistakeCountInput) mistakeCountInput.value = '0';
+
+    const statusInput = document.getElementById('status-display') as HTMLInputElement;
+    if (statusInput) statusInput.value = 'Ready';
+
+    // Clear text areas
+    const remainingWords = document.getElementById('remaining-words') as HTMLTextAreaElement;
+    if (remainingWords) remainingWords.value = '';
+
+    const recommendedGroup = document.getElementById('recommended-group') as HTMLTextAreaElement;
+    if (recommendedGroup) recommendedGroup.value = '';
+
+    const connectionReason = document.getElementById('connection-reason') as HTMLTextAreaElement;
+    if (connectionReason) connectionReason.value = '';
+
+    const recommenderInfo = document.getElementById('recommender-info') as HTMLTextAreaElement;
+    if (recommenderInfo) recommenderInfo.value = '';
+  }
+
+  /**
+   * Update UI elements based on game state
+   */
+  private updateUIElements(): void {
+    const gameState = this.gameState.getState();
+    
+    // Update counters
+    const foundCountInput = document.getElementById('found-count') as HTMLInputElement;
+    if (foundCountInput && gameState.session) {
+      foundCountInput.value = gameState.session.solvedGroupsCount.toString();
     }
+
+    const mistakeCountInput = document.getElementById('mistake-count') as HTMLInputElement;
+    if (mistakeCountInput && gameState.session) {
+      mistakeCountInput.value = gameState.session.incorrectEvaluationCount.toString();
+    }
+
+    // Update remaining words
+    const remainingWords = document.getElementById('remaining-words') as HTMLTextAreaElement;
+    if (remainingWords && gameState.session) {
+      remainingWords.value = gameState.session.remainingWords.join(', ');
+    }
+
+    // Update status
+    const statusInput = document.getElementById('status-display') as HTMLInputElement;
+    if (statusInput && gameState.session) {
+      statusInput.value = gameState.session.status;
+    }
+
+    // Update current recommendation if available
+    if (gameState.currentRecommendation) {
+      const recommendedGroup = document.getElementById('recommended-group') as HTMLTextAreaElement;
+      if (recommendedGroup) {
+        recommendedGroup.value = gameState.currentRecommendation.recommendedWords.join(', ');
+      }
+
+      const connectionReason = document.getElementById('connection-reason') as HTMLTextAreaElement;
+      if (connectionReason) {
+        connectionReason.value = gameState.currentRecommendation.explanation;
+      }
+
+      const recommenderInfo = document.getElementById('recommender-info') as HTMLTextAreaElement;
+      if (recommenderInfo) {
+        recommenderInfo.value = `Model: ${gameState.currentRecommendation.llmModel}\nProcessing Time: ${gameState.currentRecommendation.processingTimeMs}ms`;
+      }
+    }
+
+    // Enable/disable buttons based on state
+    this.updateButtonStates();
+  }
+
+  /**
+   * Update button states based on current game state
+   */
+  private updateButtonStates(): void {
+    const gameState = this.gameState.getState();
+    
+    const setupButton = document.getElementById('setup-puzzle-btn') as HTMLButtonElement;
+    if (setupButton) {
+      setupButton.disabled = this.state.isLoading || this.state.phase === 'session';
+    }
+
+    const getRecommendationBtn = document.getElementById('get-recommendation-btn') as HTMLButtonElement;
+    if (getRecommendationBtn) {
+      getRecommendationBtn.disabled = this.state.isLoading || 
+                                     this.state.phase !== 'session' || 
+                                     !this.state.isConnected;
+    }
+
+    const terminateBtn = document.getElementById('terminate-btn') as HTMLButtonElement;
+    if (terminateBtn) {
+      terminateBtn.disabled = this.state.phase !== 'session';
+    }
+
+    // Enable/disable response buttons based on whether there's a current recommendation
+    const responseButtons = document.querySelectorAll('.response-btn') as NodeListOf<HTMLButtonElement>;
+    responseButtons.forEach(button => {
+      button.disabled = !gameState.currentRecommendation;
+    });
   }
 
   /**
@@ -451,7 +620,10 @@ export class App {
     // Update component states based on game state
     const gameState = this.gameState.getState();
     
-    // Update each component with new data
+    // Update UI elements with new data
+    this.updateUIElements();
+    
+    // Update component states
     this.updateComponentStates(gameState);
     
     // Re-render if needed
@@ -474,23 +646,28 @@ export class App {
    * Refresh the UI
    */
   private refreshUI(): void {
-    // Update connection status
-    const statusElement = document.getElementById('connection-status');
-    if (statusElement) {
-      statusElement.innerHTML = this.state.isConnected ? '🟢 Connected' : '🔴 Disconnected';
-    }
-
-    // Update debug info
-    const debugElement = document.getElementById('debug-info');
-    if (debugElement) {
-      debugElement.innerHTML = `Phase: ${this.state.phase} | Session: ${this.state.currentSessionId || 'None'}`;
-    }
-
     // Update loading states
     const elements = document.querySelectorAll('.loading-overlay');
     elements.forEach(el => {
       (el as HTMLElement).style.display = this.state.isLoading ? 'block' : 'none';
     });
+
+    // Update button states
+    this.updateButtonStates();
+
+    // Show/hide sections based on phase
+    const puzzleInterface = document.querySelector('.puzzle-interface') as HTMLElement;
+    if (puzzleInterface) {
+      puzzleInterface.style.display = this.state.phase === 'error' ? 'none' : 'block';
+    }
+
+    // Show error message if in error state
+    if (this.state.phase === 'error') {
+      const statusInput = document.getElementById('status-display') as HTMLInputElement;
+      if (statusInput) {
+        statusInput.value = this.state.errorMessage || 'Error occurred';
+      }
+    }
   }
 
   /**
