@@ -6,6 +6,7 @@
  */
 
 import { App } from './App';
+import './styles.css';
 
 /**
  * Initialize the full application with all components
@@ -16,9 +17,9 @@ async function initializeApp(): Promise<void> {
   try {
     // Create and initialize the main App instance
     const app = new App('app', {
-      apiBaseUrl: 'http://localhost:8000',
-      wsBaseUrl: 'ws://localhost:8000',
-      debugMode: true, // Enable debug mode for development
+      // Use App defaults (apiBaseUrl: 'http://localhost:8000/api/v1', wsBaseUrl: 'ws://localhost:8000')
+      // or rely on dev-server proxy when using relative paths from ApiService
+      debugMode: true,
       autoConnect: true
     });
 
@@ -52,11 +53,16 @@ async function initializeApp(): Promise<void> {
  * Setup event listeners for application startup
  */
 function setupEventListeners(): void {
-  // DOM content loaded handler
-  document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM content loaded - initializing app...');
+  // Initialize immediately if DOM is already loaded, otherwise wait for DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM content loaded - initializing app...');
+      initializeApp();
+    });
+  } else {
+    console.log('DOM already loaded - initializing app immediately...');
     initializeApp();
-  });
+  }
 
   // Handle window resize for responsive design
   window.addEventListener('resize', () => {

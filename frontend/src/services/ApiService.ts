@@ -102,7 +102,16 @@ export class ApiService {
       headers: {} // Don't set Content-Type for FormData
     });
 
-    return this.handleResponse<PuzzleUploadResponse>(response);
+    const data = await this.handleResponse<any>(response);
+    // Normalize keys to camelCase expected by the frontend
+    const normalized: PuzzleUploadResponse = {
+      id: data.id,
+      words: data.words,
+      uploadedFilename: data.uploaded_filename ?? data.uploadedFilename,
+      createdAt: data.created_at ?? data.createdAt,
+      userId: data.user_id ?? data.userId,
+    };
+    return normalized;
   }
 
   /**
@@ -120,10 +129,11 @@ export class ApiService {
    * Create a new session
    */
   public async createSession(puzzleId: string, llmModel: string, userId?: string): Promise<SessionResponse> {
-    const requestData: CreateSessionRequest = {
-      puzzleId,
-      llmModel,
-      ...(userId && { userId })
+    // Backend expects snake_case keys: puzzle_id, llm_model, user_id
+    const requestData = {
+      puzzle_id: puzzleId,
+      llm_model: llmModel,
+      ...(userId && { user_id: userId })
     };
 
     const response = await this.request('/sessions', {
@@ -131,7 +141,21 @@ export class ApiService {
       body: JSON.stringify(requestData)
     });
 
-    return this.handleResponse<SessionResponse>(response);
+    const data = await this.handleResponse<any>(response);
+    // Normalize keys to camelCase expected by the frontend
+    const normalized: SessionResponse = {
+      id: data.id,
+      puzzleId: data.puzzle_id ?? data.puzzleId,
+      startTime: data.start_time ?? data.startTime,
+      lastActivity: data.last_activity ?? data.lastActivity,
+      status: data.status,
+      solvedGroupsCount: data.solved_groups_count ?? data.solvedGroupsCount ?? 0,
+      remainingWords: data.remaining_words ?? data.remainingWords ?? [],
+      incorrectEvaluationCount: data.incorrect_evaluation_count ?? data.incorrectEvaluationCount ?? 0,
+      llmModelConfig: data.llm_model_config ?? data.llmModelConfig,
+      pendingRecommendationId: data.pending_recommendation_id ?? data.pendingRecommendationId,
+    };
+    return normalized;
   }
 
   /**
@@ -142,7 +166,20 @@ export class ApiService {
       method: 'GET'
     });
 
-    return this.handleResponse<SessionResponse>(response);
+    const data = await this.handleResponse<any>(response);
+    const normalized: SessionResponse = {
+      id: data.id,
+      puzzleId: data.puzzle_id ?? data.puzzleId,
+      startTime: data.start_time ?? data.startTime,
+      lastActivity: data.last_activity ?? data.lastActivity,
+      status: data.status,
+      solvedGroupsCount: data.solved_groups_count ?? data.solvedGroupsCount ?? 0,
+      remainingWords: data.remaining_words ?? data.remainingWords ?? [],
+      incorrectEvaluationCount: data.incorrect_evaluation_count ?? data.incorrectEvaluationCount ?? 0,
+      llmModelConfig: data.llm_model_config ?? data.llmModelConfig,
+      pendingRecommendationId: data.pending_recommendation_id ?? data.pendingRecommendationId,
+    };
+    return normalized;
   }
 
   /**
@@ -153,7 +190,19 @@ export class ApiService {
       method: 'POST'
     });
 
-    return this.handleResponse<RecommendationResponse>(response);
+    const data = await this.handleResponse<any>(response);
+    const normalized: RecommendationResponse = {
+      id: data.id,
+      sessionId: data.session_id ?? data.sessionId,
+      recommendedWords: data.recommended_words ?? data.recommendedWords ?? [],
+      explanation: data.explanation,
+      timestamp: data.timestamp,
+      userEvaluation: data.user_evaluation ?? data.userEvaluation,
+      evaluationTimestamp: data.evaluation_timestamp ?? data.evaluationTimestamp,
+      llmModel: data.llm_model ?? data.llmModel,
+      processingTimeMs: data.processing_time_ms ?? data.processingTimeMs ?? 0,
+    };
+    return normalized;
   }
 
   /**
@@ -164,8 +213,19 @@ export class ApiService {
       method: 'GET'
     });
 
-    const data = await this.handleResponse<{ recommendations: RecommendationResponse[] }>(response);
-    return data.recommendations;
+    const data = await this.handleResponse<any>(response);
+    const recs: any[] = data.recommendations ?? data;
+    return (recs || []).map((r) => ({
+      id: r.id,
+      sessionId: r.session_id ?? r.sessionId,
+      recommendedWords: r.recommended_words ?? r.recommendedWords ?? [],
+      explanation: r.explanation,
+      timestamp: r.timestamp,
+      userEvaluation: r.user_evaluation ?? r.userEvaluation,
+      evaluationTimestamp: r.evaluation_timestamp ?? r.evaluationTimestamp,
+      llmModel: r.llm_model ?? r.llmModel,
+      processingTimeMs: r.processing_time_ms ?? r.processingTimeMs ?? 0,
+    }));
   }
 
   /**

@@ -65,6 +65,58 @@ export class WebSocketService {
     }
   }
 
+  /** Normalize recommendation payload */
+  private normalizeRecommendation(data: any): any {
+    if (!data || typeof data !== 'object') return data;
+    return {
+      id: data.id,
+      sessionId: data.session_id ?? data.sessionId,
+      recommendedWords: data.recommended_words ?? data.recommendedWords ?? [],
+      explanation: data.explanation,
+      processingTimeMs: data.processing_time_ms ?? data.processingTimeMs ?? 0,
+      llmModel: data.llm_model ?? data.llmModel,
+      timestamp: data.timestamp,
+      userEvaluation: data.user_evaluation ?? data.userEvaluation,
+      evaluationTimestamp: data.evaluation_timestamp ?? data.evaluationTimestamp,
+    };
+  }
+
+  /** Normalize recommendation evaluation payload */
+  private normalizeRecommendationEvaluation(data: any): any {
+    if (!data || typeof data !== 'object') return data;
+    return {
+      id: data.id,
+      userEvaluation: data.user_evaluation ?? data.userEvaluation,
+      evaluationTimestamp: data.evaluation_timestamp ?? data.evaluationTimestamp,
+    };
+  }
+
+
+  /**
+   * Normalize backend snake_case session updates to camelCase expected by the frontend
+   */
+  private normalizeSessionUpdate(data: any): any {
+    if (!data || typeof data !== 'object') return data;
+    return {
+      // IDs
+      sessionId: data.session_id ?? data.sessionId,
+      puzzleId: data.puzzle_id ?? data.puzzleId,
+      // Status & counts
+      status: data.status,
+      solvedGroupsCount: data.solved_groups_count ?? data.solvedGroupsCount,
+      incorrectEvaluationCount: data.incorrect_evaluation_count ?? data.incorrectEvaluationCount,
+      // Words
+      remainingWords: data.remaining_words ?? data.remainingWords,
+      // Timestamps / config
+      lastActivity: data.last_activity ?? data.lastActivity,
+      llmModelConfig: data.llm_model_config ?? data.llmModelConfig,
+      // Pending IDs
+      pendingRecommendationId: data.pending_recommendation_id ?? data.pendingRecommendationId,
+      // Pass through any other fields untouched
+      ...data,
+    };
+  }
+
   /**
    * Connect to WebSocket for a specific session
    */
@@ -249,17 +301,23 @@ export class WebSocketService {
 
     switch (message.type) {
       case 'session_state':
-      case 'session_updated':
-        this.emitEvent(message.type, message.data);
+      case 'session_updated': {
+        const data = this.normalizeSessionUpdate(message.data);
+        this.emitEvent(message.type, data);
         break;
+      }
       
-      case 'new_recommendation':
-        this.emitEvent('new_recommendation', message.data);
+      case 'new_recommendation': {
+        const rec = this.normalizeRecommendation(message.data);
+        this.emitEvent('new_recommendation', rec);
         break;
+      }
       
-      case 'recommendation_updated':
-        this.emitEvent('recommendation_updated', message.data);
+      case 'recommendation_updated': {
+        const update = this.normalizeRecommendationEvaluation(message.data);
+        this.emitEvent('recommendation_updated', update);
         break;
+      }
       
       case 'recommendation_request_received':
         this.emitEvent('recommendation_request_received', { timestamp: message.timestamp });

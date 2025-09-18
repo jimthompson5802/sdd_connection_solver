@@ -309,6 +309,105 @@ body {
   background-color: var(--color-secondary);
 }
 
+/* Subtle helper text for upload instructions */
+.upload-help {
+  margin-left: auto;
+  color: var(--color-text-light);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  max-width: 420px;
+}
+
+.upload-help .help-text {
+  margin: 0 0 var(--spacing-sm);
+}
+
+.upload-help .help-examples {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.upload-help code {
+  font-family: var(--font-family-mono);
+  background: #f6f8fa;
+  border: 1px solid #e6e8eb;
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+@media (max-width: 768px) {
+  .upload-help {
+    max-width: 100%;
+    margin-left: 0;
+    margin-top: var(--spacing-sm);
+  }
+}
+
+/* Compact info tooltip */
+.info-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #eef1f4;
+  color: #4a5568;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  border: 1px solid #e2e8f0;
+  cursor: help;
+  padding: 0;
+}
+
+.info-tooltip:focus {
+  outline: 2px solid #94a3b8;
+  outline-offset: 2px;
+}
+
+.info-tooltip .tooltip-content {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  max-width: 320px;
+  background: #ffffff;
+  border: 1px solid #e6e8eb;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--color-text);
+  font-size: 12px;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.info-tooltip:hover .tooltip-content,
+.info-tooltip:focus .tooltip-content,
+.info-tooltip:focus-within .tooltip-content {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.tooltip-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.tooltip-examples code {
+  font-family: var(--font-family-mono);
+  background: #f6f8fa;
+  border: 1px solid #e6e8eb;
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
 /* Remaining Words Section */
 .remaining-words-section {
   display: flex;
