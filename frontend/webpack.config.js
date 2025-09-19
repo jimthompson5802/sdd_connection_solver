@@ -73,7 +73,10 @@ module.exports = (env, argv) => {
           changeOrigin: true,
         },
         {
-          context: ['/ws'],
+          // Important: Do NOT proxy the dev server's own HMR websocket path '/ws'.
+          // Only proxy our app's websocket endpoint to the backend.
+          // The backend exposes: `/ws/sessions/:id/recommendations`
+          context: ['/ws/sessions'],
           target: 'ws://localhost:8000',
           ws: true,
           changeOrigin: true,

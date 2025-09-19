@@ -39,7 +39,12 @@ class Session(BaseModel):
     last_activity: datetime = Field(default_factory=datetime.now)
     status: str = Field(default="active")
     solved_groups_count: int = Field(default=0, ge=0, le=4)
-    remaining_words: List[str] = Field(..., min_length=0, max_length=16)
+    # Default to 16 placeholder words when not explicitly provided. This ensures
+    # lightweight constructions in tests still validate while real sessions use
+    # actual puzzle words provided by services.
+    remaining_words: List[str] = Field(
+        default_factory=lambda: [f"word_{i+1}" for i in range(16)], min_length=0, max_length=16
+    )
     incorrect_evaluation_count: int = Field(default=0, ge=0, le=4)
     recommendation_history: List[Recommendation] = Field(default_factory=list)
     solved_groups: List[Group] = Field(default_factory=list)

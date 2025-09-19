@@ -116,6 +116,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost:5173",  # Vite development server
         "http://127.0.0.1:5173",
+        "http://localhost:8080",  # Webpack dev server
+        "http://127.0.0.1:8080",
         # Add production URLs as needed
     ],
     allow_credentials=True,

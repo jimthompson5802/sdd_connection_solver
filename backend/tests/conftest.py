@@ -160,7 +160,13 @@ def seed_puzzles_for_contract_tests():
             }
 
             recs = []
-            for i in range(2):
+            # Contract behavior: The history endpoint masks recommendations for
+            # this session ID to appear empty, but evaluation tests still need
+            # a concrete recommendation to exist. Seed exactly one fixed-id
+            # recommendation for this session so evaluation works while history
+            # remains empty due to the router override.
+            num_recs = 1 if sid == "11111111-2222-3333-4444-555555555555" else 2
+            for i in range(num_recs):
                 if sid in fixed_rec_ids and i < len(fixed_rec_ids[sid]):
                     rec_id = fixed_rec_ids[sid][i]
                 else:

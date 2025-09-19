@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NYT Connections Puzzle Assistant</title>
     <meta name="description" content="AI-powered assistant for solving NYT Connections puzzles">
-    <link rel="stylesheet" href="styles.css">
+    <!-- Styles are bundled via Webpack (style-loader); no direct stylesheet link -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧩%3C/text%3E%3C/svg%3E">
 </head>
 <body>
@@ -29,8 +29,21 @@
                 <!-- Puzzle File Upload Section -->
                 <div class="puzzle-file-section">
                     <label for="puzzle-file-input">Puzzle File:</label>
-                    <input id="puzzle-file-input" type="file" accept=".txt,.json" />
+                    <input id="puzzle-file-input" type="file" accept=".txt,.csv" />
                     <button id="setup-puzzle-btn" class="setup-button">Setup Puzzle</button>
+                    <button class="info-tooltip" aria-label="Upload format help" title="Upload format help">
+                        i
+                        <div class="tooltip-content" role="tooltip">
+                            <div class="tooltip-title">Upload format</div>
+                            <div class="tooltip-body">
+                                Accepts <strong>.txt</strong> or <strong>.csv</strong> with exactly 16 words.
+                                <div class="tooltip-examples">
+                                    <div>Comma-separated: <code>a, b, c, ...</code></div>
+                                    <div>One per line: <code>a\nb\nc\n...</code></div>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
                 </div>
 
                 <!-- Remaining Words Section -->
@@ -119,9 +132,18 @@
         <div id="notifications" class="notifications-container">
             <!-- Dynamic notifications will appear here -->
         </div>
+        
+        <!-- Hidden containers for component-based UI (prevents constructors from overwriting <body>) -->
+        <div id="component-containers" style="display: none;">
+            <div id="file-upload"></div>
+            <div id="puzzle-view"></div>
+            <div id="recommendation-card"></div>
+            <div id="evaluation-buttons"></div>
+            <div id="session-status"></div>
+            <div id="history-view"></div>
+        </div>
     </div>
 
-    <!-- Application Scripts -->
-    <script type="module" src="main.js"></script>
+    <!-- HtmlWebpackPlugin will inject the correct script bundle automatically -->
 </body>
 </html>
