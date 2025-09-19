@@ -2,7 +2,8 @@
 
 **Feature Branch**: `001-nyt-connections-puzzle`  
 **Created**: September 8, 2025  
-**Status**: Draft  
+**Last Updated**: September 18, 2025  
+**Status**: In Progress  
 **Input**: User description: "NYT Connections Puzzle Assistant Web Application - Develop a web application that assists users in solving the New York Times Connections Puzzle. The application leverages a Large Language Model (LLM) to generate recommendations for grouping words and tracks invalid guesses to enhance the solving experience."
 
 ## Execution Flow (main)
@@ -69,6 +70,10 @@ A puzzle enthusiast wants to solve the NYT Connections puzzle with AI assistance
 6. **Given** a user has made 3 incorrect guesses, **When** they make their 4th incorrect guess, **Then** the system indicates a failed solution and prevents further guessing, but allows the user to view the full history of guesses
 7. **Given** a user makes an incorrect guess, **When** they mark it as "one-away", **Then** the system visually distinguishes this guess in the history as a one-away error
 8. **Given** the puzzle is failed or solved, **When** the user views the puzzle, **Then** the user can see the full history of all recommendations and their responses
+9. **Given** the system has generated a recommendation, **When** it is pending user evaluation, **Then** the system MUST NOT generate another recommendation for that session until the pending one is marked correct/incorrect/one-away
+10. **Given** a session is marked as failed (4 incorrect guesses) or completed (4 solved groups), **When** the user attempts to request a new recommendation, **Then** the system prevents new recommendations and indicates the terminal status (failed or completed)
+11. **Given** a user wants to stop solving, **When** they abandon the session, **Then** the system marks the session as abandoned and preserves history for later viewing
+12. **Given** an advanced user or admin updates the AI prompt template for the current session, **When** the next recommendation is requested, **Then** the LLM uses the updated template and context
 
 ### Edge Cases
 - How does the system handle network failures when requesting AI recommendations?
@@ -77,6 +82,8 @@ A puzzle enthusiast wants to solve the NYT Connections puzzle with AI assistance
 - What happens when the user reaches 4 incorrect guesses and the puzzle fails?
 - Can the user still view recommendations after failing the puzzle? (Yes, but cannot restart)
 - What happens if the user tries to mark a correct guess as "one-away"?
+- What happens if a recommended group duplicates a prior incorrect or one-away attempt? (It MUST be filtered out)
+- What happens if the user refreshes while a recommendation is pending evaluation? (The pending state MUST persist and block new recommendations until evaluated)
 
 ## Requirements
 
@@ -84,7 +91,7 @@ A puzzle enthusiast wants to solve the NYT Connections puzzle with AI assistance
 - **FR-001**: System MUST allow the user to upload a text file containing exactly 16 comma-separated words to initialize the puzzle
 - **FR-002**: System MUST display the 16 puzzle words in a selectable interface
 - **FR-003**: System MUST integrate with an LLM to generate a single recommended group of 4 words at a time
-- **FR-004**: The LLM to use MUST be a configuration parameter specified when the system is started
+- **FR-004**: The LLM model MUST be configurable per session (selected at session creation) and MAY default from a system-level configuration
 - **FR-005**: System MUST display each AI-generated group recommendation with a clear, textual explanation of the connection
 - **FR-006**: System MUST record each group recommendation and the user's evaluation (correct/incorrect/one-away)
 - **FR-007**: System MUST visually distinguish between correct, incorrect, and one-away groups in the guess history
@@ -105,12 +112,21 @@ A puzzle enthusiast wants to solve the NYT Connections puzzle with AI assistance
 - **FR-022**: If a group is marked as a one-away error, the system MUST track that group, ensure it is not recommended again, and use the information that three of the four words are connected for future recommendations, however, it is unknown which three words are correct and which one is incorrect
 - **FR-023**: The system MUST use the updated status (remaining words, incorrect groups, one-away groups) as context for the LLM to generate the next recommendation
 
+- **FR-024**: The system MUST allow only one pending recommendation per session; new recommendations are blocked until the prior one is evaluated
+- **FR-025**: The system MUST maintain a per-session AI recommendation context including remaining words, solved groups (with theme and difficulty), incorrect groups, and one-away groups, and expose a context summary for use by the LLM and UI
+- **FR-026**: The system MUST support updating the AI prompt template per session; subsequent recommendations MUST use the updated template
+- **FR-027**: The system MUST prevent recommending any group previously attempted as incorrect or one-away
+- **FR-028**: The system MUST track session status with values: active, completed, failed, abandoned, and enforce terminal states (completed/failed/abandoned) by disallowing new recommendations
+- **FR-029**: The system MUST provide a user action to abandon a session, preserving history for later viewing
+- **FR-030**: The system MUST provide session statistics (e.g., solved groups count, remaining words count, incorrect evaluation count, recommendation count, last activity)
+
 ### Key Entities
 - **Puzzle**: Contains exactly 16 user-provided words arranged in 4 hidden groups of 4 words each, with associated difficulty levels and themes
 - **Word**: Individual puzzle element with text content and group membership
 - **Recommendation**: System/LLM attempt containing 4 recommended words, timestamp, explanation, and result status (correct/incorrect/one-away)
 - **Group**: Set of 4 related words with a common theme or category, has difficulty color coding
-- **Session**: User's current puzzle-solving session including progress state, recommendation history, remaining words, and incorrect guess count
+- **Session**: User's current puzzle-solving session including progress state, status (active/completed/failed/abandoned), recommendation history (with a single pending recommendation at a time), remaining words, solved groups count, incorrect evaluation count, start time, and last activity
+- **AIRecommendationContext**: Per-session context provided to the LLM, including remaining words, solved groups (theme, difficulty), incorrect groups, one-away groups, and the active prompt template; supports summary generation and template updates
 
 ---
 
